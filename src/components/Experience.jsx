@@ -102,6 +102,16 @@ export const scenes = [
       label: "Estrategias clave"
     }
   },
+  {
+    path: "models/interactive_scene.glb",
+    mainColor: "#FF1744",
+    name: "Exploración Interactiva",
+    description: "Explora las diferencias entre infraestructuras",
+    stats: {
+      energy: "→",
+      label: "Usa las flechas"
+    }
+  },
 ];
 
 // Componente para crear humo/emisiones animadas
@@ -471,6 +481,14 @@ export const Experience = () => {
         >
           <MeshDistortMaterial color={scenes[7].mainColor} speed={3} />
         </Dodecahedron>
+
+        <mesh
+          position-x={8 * (viewport.width + slideDistance)}
+          position-y={viewport.height / 2 + 1.5}
+        >
+          <icosahedronGeometry args={[1, 0]} />
+          <MeshDistortMaterial color={scenes[8].mainColor} speed={3} />
+        </mesh>
       </group>
 
       {/* Grid con colores más industriales */}
