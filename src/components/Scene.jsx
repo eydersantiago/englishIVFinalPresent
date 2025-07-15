@@ -396,16 +396,15 @@ export const Scene = ({ mainColor, path, name, stats, ...props }) => {
           autoRotate
           enablePan={false}
           maxPolarAngle={DEG2RAD * 75}
-          minDistance={6}
+          minDistance={2}
           maxDistance={10}
-          autoRotateSpeed={0.5}
+          autoRotateSpeed={0.1}
         />
         
         {/* Contenido 3D específico para cada slide */}
         <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
           <group scale={ratioScale}>
-            
-            {/* Slide 0: Title Slide - NEW */}
+
             {name === "Environmental Impact of Data Centers" && (
               <group>
 
@@ -417,17 +416,6 @@ export const Scene = ({ mainColor, path, name, stats, ...props }) => {
                   transparent
                 />
 
-
-                {/* Title Text */}
-                <Text position={[0, -1, 0]} fontSize={0.3} color="#000000" textAlign="center" maxWidth={6}>
-                  Environmental Impact of{'\n'}Data Centers and{'\n'}Cloud Computing
-                </Text>
-                
-                {/* Author Info */}
-                <Text position={[0, -2.2, 0]} fontSize={0.15} color="#666666" textAlign="center">
-                  Eyder Santiago Suarez Chavez{'\n'}
-                  Code: 2322714
-                </Text>
                 
                 {/* Animated data particles */}
                 <Float speed={3} rotationIntensity={0} floatIntensity={0.5}>
@@ -447,503 +435,422 @@ export const Scene = ({ mainColor, path, name, stats, ...props }) => {
                 </Float>
               </group>
             )}
+
             
-            {/* Slide 1: Interactive Exploration - MOVED UP */}
-            {name === "Interactive Exploration" && (
-              <group>
-                <Text position={[0, 3.5, 0]} fontSize={0.25} color="#000000" textAlign="center">
-                  Use arrow keys ↑↓←→ or WASD to explore
-                </Text>
-                
-                {/* Traditional Data Center - Left */}
-                <group position={[-3, 0, 0]}>
-                  <Text position={[0, 2.5, 0]} fontSize={0.2} color="#ff0000">
-                    Traditional Data Center
+            
+          {/* Slide 1: Table of Contents - NEW */}
+          {name === "Table of Contents" && (
+            <group>
+              {/* Estructura visual del índice */}
+              <group position={[0, 1, 0]}>
+                {/* Columna izquierda */}
+                <group position={[-2, 0, 0]}>
+                  <Text position={[0, 1.5, 0]} fontSize={0.2} color="#000000">
+                    1. Keywords
                   </Text>
-                  <InteractiveDataCenterExploration type="traditional" position={[0, 0, 0]} scale={0.3} />
+                  <Text position={[0, 1, 0]} fontSize={0.2} color="#000000">
+                    2. Introduction
+                  </Text>
+                  <Text position={[0, 0.5, 0]} fontSize={0.2} color="#000000">
+                    3. Methods
+                  </Text>
+                  <Text position={[0, 0, 0]} fontSize={0.2} color="#000000">
+                    4. Results
+                  </Text>
                 </group>
                 
-                {/* VS in the center */}
-                <Text position={[0, 0, 0]} fontSize={0.4} color="#666666">
-                  VS
-                </Text>
+                {/* Columna derecha */}
+                <group position={[2, 0, 0]}>
+                  <Text position={[0, 1.5, 0]} fontSize={0.2} color="#000000">
+                    5. Discussion
+                  </Text>
+                  <Text position={[0, 1, 0]} fontSize={0.2} color="#000000">
+                    6. Conclusions
+                  </Text>
+                  <Text position={[0, 0.5, 0]} fontSize={0.2} color="#000000">
+                    7. References
+                  </Text>
+                </group>
                 
-                {/* Cloud Infrastructure - Right */}
-                <group position={[3, 0, 0]}>
-                  <Text position={[0, 2.5, 0]} fontSize={0.2} color="#00ff00">
+                {/* Líneas conectoras animadas */}
+                {[...Array(7)].map((_, i) => (
+                  <Float key={i} speed={2} rotationIntensity={0} floatIntensity={0.3}>
+                    <Cylinder
+                      args={[0.02, 0.02, 0.5]}
+                      position={[
+                        i < 4 ? -1 : 1,
+                        1.5 - (i % 4) * 0.5,
+                        0
+                      ]}
+                      rotation={[0, 0, Math.PI / 2]}
+                    >
+                      <meshBasicMaterial color={mainColor} opacity={0.6} transparent />
+                    </Cylinder>
+                  </Float>
+                ))}
+              </group>
+              
+              {/* Icono central */}
+              <Torus args={[0.6, 0.2, 16, 100]} position={[0, -1, 0]}>
+                <MeshDistortMaterial color={mainColor} speed={2} distort={0.3} />
+              </Torus>
+            </group>
+          )}
+
+          {/* Slide 2: Keywords - NEW */}
+          {name === "Keywords" && (
+            <group>
+              {/* Nube de palabras clave en 3D */}
+              <Float speed={1} rotationIntensity={0.5} floatIntensity={0.5}>
+                <group>
+                  <Text position={[0, 1.5, 0]} fontSize={0.3} color={mainColor}>
+                    Data Centers
+                  </Text>
+                  <Text position={[-1.5, 0.5, 0.5]} fontSize={0.25} color="#3B82F6">
                     Cloud Computing
                   </Text>
-                  <InteractiveDataCenterExploration type="cloud" position={[0, 0, 0]} scale={0.3} />
+                  <Text position={[1.5, 0.5, -0.5]} fontSize={0.25} color="#10B981">
+                    CO₂ Emissions
+                  </Text>
+                  <Text position={[-1, -0.5, 0.3]} fontSize={0.2} color="#F59E0B">
+                    Environmental
+                  </Text>
+                  <Text position={[1, -0.5, -0.3]} fontSize={0.2} color="#8B5CF6">
+                    Sustainability
+                  </Text>
                 </group>
+              </Float>
+              
+              {/* Conexiones entre términos */}
+              {[...Array(8)].map((_, i) => (
+                <Cylinder
+                  key={i}
+                  args={[0.01, 0.01, 2]}
+                  position={[0, 0, 0]}
+                  rotation={[
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                  ]}
+                >
+                  <meshBasicMaterial color="#cccccc" opacity={0.3} transparent />
+                </Cylinder>
+              ))}
+            </group>
+          )}
+
+          {/* Slide 3: Introduction - NEW */}
+          {name === "Introduction" && (
+            <group>
+              {/* Problema principal */}
+              <Box args={[4, 0.5, 0.1]} position={[0, 2, 0]}>
+                <meshStandardMaterial color="#ff6b6b" />
+              </Box>
+              <Text position={[0, 2, 0.1]} fontSize={0.15} color="#ffffff" maxWidth={3.5}>
+                Problem: 1% of global electricity consumption
+              </Text>
+              
+              {/* Motivación */}
+              <group position={[0, 0, 0]}>
+                <Sphere args={[1, 32, 32]}>
+                  <meshStandardMaterial 
+                    color="#3B82F6" 
+                    wireframe 
+                    opacity={0.5} 
+                    transparent 
+                  />
+                </Sphere>
+                <Text position={[0, 0, 0]} fontSize={0.1} color="#000000" textAlign="center">
+                  Need to minimize{'\n'}ecological impact{'\n'}of IT
+                </Text>
               </group>
-            )}
-            
-            {/* Slide 2: Environmental Impact - Datacenter comparison */}
-            {name === "Environmental Impact" && (
-              <group>
-                {/* Traditional data center (left) */}
-                <group position={[-2, 0, 0]}>
-                  <DataCenterBuilding position={[0, -1, 0]} scale={0.8} />
-                  <ServerRack position={[0, 0.5, 0]} scale={0.5} color="#8B4513" />
-                  <CO2Emissions position={[0, 1.5, -1]} scale={0.7} intensity={1.5} />
-                  <Text position={[0, -2, 0]} fontSize={0.2} color="#666666">
-                    On-Premises
-                  </Text>
-                </group>
-                
-                {/* Cloud computing (right) */}
-                <group position={[2, 0, 0]}>
-                  <CloudServer position={[0, 0, 0]} scale={1.2} color={mainColor} />
-                  <RenewableEnergy position={[1, -1, 0]} scale={0.5} />
-                  <Text position={[0, -2, 0]} fontSize={0.2} color="#666666">
-                    Cloud Computing
-                  </Text>
-                </group>
-                
-                {/* Comparison arrow */}
-                <Cone args={[0.2, 0.5]} position={[0, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
-                  <meshStandardMaterial color={mainColor} />
-                </Cone>
-              </group>
-            )}
-            
-            {/* Slide 3: Energy Consumption - Growth chart */}
-            {name === "Energy Consumption" && (
-              <group>
-                {/* 3D Bar charts */}
-                <group position={[-2, -1, 0]}>
-                  {/* 2010 Bar */}
-                  <Box args={[0.8, 1, 0.8]} position={[0, 0.5, 0]}>
-                    <meshStandardMaterial color="#ff6b6b" />
-                  </Box>
-                  <Text position={[0, -0.5, 0]} fontSize={0.15} color="#000000">
-                    2010
-                  </Text>
-                </group>
-                
-                <group position={[0, -1, 0]}>
-                  {/* 2018 - Instances */}
-                  <Box args={[0.8, 5.5, 0.8]} position={[0, 2.75, 0]}>
-                    <meshStandardMaterial color={mainColor} />
-                  </Box>
-                  <Text position={[0, -0.5, 0]} fontSize={0.15} color="#000000">
-                    Instances
-                  </Text>
-                  <Text position={[0, 6, 0]} fontSize={0.2} color={mainColor}>
-                    +550%
-                  </Text>
-                </group>
-                
-                <group position={[2, -1, 0]}>
-                  {/* 2018 - Energy */}
-                  <Box args={[0.8, 1.06, 0.8]} position={[0, 0.53, 0]}>
-                    <meshStandardMaterial color="#4ecdc4" />
-                  </Box>
-                  <Text position={[0, -0.5, 0]} fontSize={0.15} color="#000000">
-                    Energy
-                  </Text>
-                  <Text position={[0, 1.5, 0]} fontSize={0.2} color="#4ecdc4">
-                    +6%
-                  </Text>
-                </group>
-                
-                {/* Lightning bolts representing energy */}
-                <Cone args={[0.3, 1]} position={[-1, 3, 0]} rotation={[0, 0, Math.PI]}>
-                  <meshBasicMaterial color="#ffeb3b" />
-                </Cone>
-                <Cone args={[0.3, 1]} position={[1, 3, 0]} rotation={[0, 0, Math.PI]}>
-                  <meshBasicMaterial color="#ffeb3b" />
-                </Cone>
-              </group>
-            )}
-            
-            {/* Slide 4: PUE Efficiency - Comparative meters */}
-            {name === "PUE Efficiency" && (
-              <group>
-                {/* Cloud Meter */}
-                <group position={[-2, 0, 0]}>
-                  <EfficiencyMeter position={[0, 0, 0]} value={1.09} />
-                  <CloudServer position={[0, 2, 0]} scale={0.8} color={mainColor} />
-                  <Text position={[0, -1.5, 0]} fontSize={0.2} color="#00ff00">
-                    Cloud: 1.09-1.18
-                  </Text>
-                </group>
-                
-                {/* On-premises Meter */}
-                <group position={[2, 0, 0]}>
-                  <EfficiencyMeter position={[0, 0, 0]} value={1.8} />
-                  <DataCenterBuilding position={[0, 2, 0]} scale={0.5} />
-                  <Text position={[0, -1.5, 0]} fontSize={0.2} color="#ff0000">
-                    On-premises: 1.8
-                  </Text>
-                </group>
-                
-                {/* Efficiency symbol in center */}
-                <Torus args={[0.5, 0.2, 16, 100]} position={[0, 0, 0]}>
-                  <MeshDistortMaterial color={mainColor} speed={2} distort={0.3} />
-                </Torus>
-              </group>
-            )}
-            
-            {/* Slide 5: CO₂e Emissions - Provider comparison */}
-            {name === "CO₂e Emissions" && (
-              <group>
+              
+              {/* Objetivo */}
+              <Box args={[4, 0.5, 0.1]} position={[0, -2, 0]}>
+                <meshStandardMaterial color="#10B981" />
+              </Box>
+              <Text position={[0, -2, 0.1]} fontSize={0.15} color="#ffffff" maxWidth={3.5}>
+                Goal: Guide organizational decisions
+              </Text>
+              
+              {/* Flechas indicando flujo */}
+              <Cone args={[0.2, 0.5]} position={[0, 1, 0]} rotation={[Math.PI, 0, 0]}>
+                <meshStandardMaterial color={mainColor} />
+              </Cone>
+              <Cone args={[0.2, 0.5]} position={[0, -1, 0]} rotation={[Math.PI, 0, 0]}>
+                <meshStandardMaterial color={mainColor} />
+              </Cone>
+            </group>
+          )}
+
+          {/* Slide 4: Methods - NEW */}
+          {name === "Methods" && (
+            <group>
+              {/* Diseño del estudio */}
+              <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
+                Analytical & Comparative Study
+              </Text>
+              
+              {/* Fuentes de datos - 3 proveedores */}
+              <group position={[0, 0.5, 0]}>
                 {/* AWS */}
                 <group position={[-2.5, 0, 0]}>
-                  <Cylinder args={[0.5, 0.5, 4.52 * 0.5]} position={[0, -1 + 4.52 * 0.25, 0]}>
-                    <meshStandardMaterial color="#ff9500" />
-                  </Cylinder>
-                  <Text position={[0, 1.5, 0]} fontSize={0.2} color="#ff9500">
+                  <Box args={[1.2, 1.2, 1.2]}>
+                    <meshStandardMaterial color="#FF9500" />
+                  </Box>
+                  <Text position={[0, 0, 0.7]} fontSize={0.15} color="#ffffff">
                     AWS
                   </Text>
-                  <Text position={[0, 1, 0]} fontSize={0.15} color="#666666">
-                    4.52 kg
+                  <Text position={[0, -0.8, 0]} fontSize={0.1} color="#666666">
+                    2022-2023
                   </Text>
-                  <CO2Emissions position={[0, 2, 0]} scale={0.4} intensity={0.9} />
-                </group>
-                
-                {/* Microsoft */}
-                <group position={[0, 0, 0]}>
-                  <Cylinder args={[0.5, 0.5, 4.92 * 0.5]} position={[0, -1 + 4.92 * 0.25, 0]}>
-                    <meshStandardMaterial color="#0078d4" />
-                  </Cylinder>
-                  <Text position={[0, 1.7, 0]} fontSize={0.2} color="#0078d4">
-                    Azure
-                  </Text>
-                  <Text position={[0, 1.2, 0]} fontSize={0.15} color="#666666">
-                    4.92 kg
-                  </Text>
-                  <CO2Emissions position={[0, 2.2, 0]} scale={0.4} intensity={1} />
                 </group>
                 
                 {/* Google */}
-                <group position={[2.5, 0, 0]}>
-                  <Cylinder args={[0.5, 0.5, 5.25 * 0.5]} position={[0, -1 + 5.25 * 0.25, 0]}>
-                    <meshStandardMaterial color="#4285f4" />
-                  </Cylinder>
-                  <Text position={[0, 1.8, 0]} fontSize={0.2} color="#4285f4">
+                <group position={[0, 0, 0]}>
+                  <Box args={[1.2, 1.2, 1.2]}>
+                    <meshStandardMaterial color="#4285F4" />
+                  </Box>
+                  <Text position={[0, 0, 0.7]} fontSize={0.15} color="#ffffff">
                     Google
                   </Text>
-                  <Text position={[0, 1.3, 0]} fontSize={0.15} color="#666666">
-                    5.25 kg
+                  <Text position={[0, -0.8, 0]} fontSize={0.1} color="#666666">
+                    2022-2023
                   </Text>
-                  <CO2Emissions position={[0, 2.3, 0]} scale={0.4} intensity={1.1} />
                 </group>
                 
-                {/* CO₂e/TB year text */}
-                <Text position={[0, -2, 0]} fontSize={0.18} color="#000000">
-                  CO₂e/TB year
+                {/* Microsoft */}
+                <group position={[2.5, 0, 0]}>
+                  <Box args={[1.2, 1.2, 1.2]}>
+                    <meshStandardMaterial color="#0078D4" />
+                  </Box>
+                  <Text position={[0, 0, 0.7]} fontSize={0.15} color="#ffffff">
+                    Azure
+                  </Text>
+                  <Text position={[0, -0.8, 0]} fontSize={0.1} color="#666666">
+                    2022-2025
+                  </Text>
+                </group>
+              </group>
+              
+              {/* Métricas analizadas */}
+              <group position={[0, -1.5, 0]}>
+                <Text position={[0, 0, 0]} fontSize={0.15} color="#000000">
+                  Metrics: PUE • Energy • CO₂e/TB
                 </Text>
               </group>
-            )}
-            
-            {/* Slide 6: Small Businesses */}
-            {name === "Small Businesses" && (
-              <group>
-                {/* Small building */}
-                <Box args={[1.5, 1, 1]} position={[-1.5, 0, 0]}>
-                  <meshStandardMaterial color="#e74c3c" />
+              
+              {/* Herramientas */}
+              <group position={[0, -2.5, 0]}>
+                {['ESG Reports', 'Climatiq', 'NREL'].map((tool, i) => (
+                  <Cylinder
+                    key={i}
+                    args={[0.3, 0.3, 0.1]}
+                    position={[(i - 1) * 1.2, 0, 0]}
+                  >
+                    <meshStandardMaterial color={mainColor} metalness={0.5} />
+                  </Cylinder>
+                ))}
+              </group>
+            </group>
+          )}
+
+          {/* Slide 5: Results Overview - NEW */}
+          {name === "Results" && (
+            <group>
+              {/* Título de resultados */}
+              <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
+                Key Findings
+              </Text>
+              
+              {/* Resultado 1: PUE Comparison */}
+              <group position={[-2.5, 0.5, 0]}>
+                <Box args={[1.5, 1, 0.1]}>
+                  <meshStandardMaterial color="#10B981" />
                 </Box>
-                <Text position={[-1.5, -1, 0]} fontSize={0.15} color="#666666">
-                  {"<100 employees"}
+                <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
+                  PUE{'\n'}35-40%{'\n'}Better
                 </Text>
-                
-                {/* Arrow to cloud */}
-                <group position={[0, 0, 0]}>
-                  <Cylinder args={[0.1, 0.1, 2]} position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-                    <meshStandardMaterial color={mainColor} />
-                  </Cylinder>
-                  <Cone args={[0.2, 0.5]} position={[1.2, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
-                    <meshStandardMaterial color={mainColor} />
-                  </Cone>
-                </group>
-                
-                {/* Cloud with reduction percentage */}
-                <group position={[2, 0, 0]}>
-                  <CloudServer position={[0, 0, 0]} scale={1} color={mainColor} />
-                  <Text position={[0, -1.5, 0]} fontSize={0.25} color="#00ff00">
-                    -60%
-                  </Text>
-                  <Text position={[0, -2, 0]} fontSize={0.15} color="#666666">
-                    emissions
-                  </Text>
-                </group>
               </group>
-            )}
-            
-            {/* Slide 7: Medium Businesses */}
-            {name === "Medium Businesses" && (
-              <group>
-                {/* Hybrid model */}
-                <group position={[-1.5, 0, 0]}>
-                  <Box args={[1.5, 1.5, 1.2]} position={[0, 0, 0]}>
-                    <meshStandardMaterial color="#f39c12" />
+              
+              {/* Resultado 2: Emissions */}
+              <group position={[0, 0.5, 0]}>
+                <Box args={[1.5, 1, 0.1]}>
+                  <meshStandardMaterial color="#F59E0B" />
+                </Box>
+                <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
+                  CO₂e{'\n'}4.52-5.25{'\n'}kg/TB/yr
+                </Text>
+              </group>
+              
+              {/* Resultado 3: Size Impact */}
+              <group position={[2.5, 0.5, 0]}>
+                <Box args={[1.5, 1, 0.1]}>
+                  <meshStandardMaterial color="#8B5CF6" />
+                </Box>
+                <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
+                  Small Biz{'\n'}-60%{'\n'}Emissions
+                </Text>
+              </group>
+              
+              {/* Gráfico abstracto de tendencia */}
+              <group position={[0, -1.5, 0]}>
+                {[...Array(5)].map((_, i) => (
+                  <Box
+                    key={i}
+                    args={[0.3, 0.2 + i * 0.3, 0.3]}
+                    position={[(i - 2) * 0.5, (0.2 + i * 0.3) / 2 - 0.5, 0]}
+                  >
+                    <meshStandardMaterial color={mainColor} />
                   </Box>
-                  <ServerRack position={[0, 0, 0]} scale={0.3} />
-                </group>
-                
-                {/* Hybrid connection */}
-                <Torus args={[1, 0.1, 8, 32]} position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
-                  <meshStandardMaterial color={mainColor} />
+                ))}
+                <Text position={[0, -1, 0]} fontSize={0.1} color="#666666">
+                  Growth 2010-2018
+                </Text>
+              </group>
+            </group>
+          )}
+
+          {/* Slide 14: Discussion - NEW */}
+          {name === "Discussion" && (
+            <group>
+              {/* Insights principales */}
+              <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
+                Key Insights
+              </Text>
+              
+              {/* Paradoja PUE vs Emisiones */}
+              <group position={[0, 1, 0]}>
+                <Torus args={[0.8, 0.3, 16, 100]} rotation={[Math.PI / 2, 0, 0]}>
+                  <meshStandardMaterial color="#ff6b6b" />
                 </Torus>
-                
-                {/* Partial cloud */}
-                <group position={[1.5, 0, 0]}>
-                  <CloudServer position={[0, 0, 0]} scale={0.8} color={mainColor} />
-                </group>
-                
-                {/* Reduction indicator */}
-                <Text position={[0, -2, 0]} fontSize={0.25} color="#f39c12">
-                  -40-50%
-                </Text>
-                <Text position={[0, -2.5, 0]} fontSize={0.15} color="#666666">
-                  Hybrid Model
+                <Text position={[0, 0, 0]} fontSize={0.1} color="#000000" textAlign="center">
+                  Paradox:{'\n'}Best PUE ≠{'\n'}Lowest CO₂
                 </Text>
               </group>
-            )}
-            
-            {/* Slide 8: Large Corporations */}
-            {name === "Large Corporations" && (
-              <group>
-                {/* Corporate tower */}
-                <group position={[0, 0, 0]}>
-                  {[0, 1, 2].map((i) => (
-                    <Box key={i} args={[2 - i * 0.3, 1, 1.5 - i * 0.2]} position={[0, i, 0]}>
-                      <meshStandardMaterial color={`hsl(${200 + i * 20}, 70%, 50%)`} />
-                    </Box>
-                  ))}
-                </group>
-                
-                {/* Solar panels */}
-                <group position={[-2, 0, 0]}>
-                  {[...Array(4)].map((_, i) => (
-                    <Box key={i} args={[0.5, 0.5, 0.05]} position={[i * 0.6 - 0.9, 2.5, 0]} rotation={[Math.PI / 6, 0, 0]}>
-                      <meshStandardMaterial color="#1a237e" metalness={0.8} roughness={0.2} />
-                    </Box>
-                  ))}
-                </group>
-                
-                {/* Wind turbines */}
-                <RenewableEnergy position={[2, 0, 0]} scale={0.8} />
-                <RenewableEnergy position={[2.5, 0, -1]} scale={0.6} />
-                
-                {/* Efficiency indicator */}
-                <Text position={[0, -2, 0]} fontSize={0.2} color="#00ff00">
-                  With renewables = Cloud
-                </Text>
-              </group>
-            )}
-            
-            {/* Slide 9: Recommendations */}
-            {name === "Recommendations" && (
-              <group>
-                {/* Central core */}
-                <Sphere args={[0.8, 32, 32]} position={[0, 0, 0]}>
-                  <MeshDistortMaterial color={mainColor} speed={2} distort={0.3} />
-                </Sphere>
-                
-                {/* 4 Strategies around */}
-                {[
-                  { pos: [2, 0, 0], icon: "cloud", label: "Selective\nMigration" },
-                  { pos: [-2, 0, 0], icon: "hybrid", label: "Hybrid\nModel" },
-                  { pos: [0, 0, 2], icon: "renewable", label: "Renewable\nEnergy" },
-                  { pos: [0, 0, -2], icon: "efficiency", label: "PUE\nOptimization" }
-                ].map((strategy, i) => (
-                  <group key={i} position={strategy.pos}>
-                    {/* Connection to center */}
-                    <Cylinder 
-                      args={[0.05, 0.05, 2]} 
-                      position={[-strategy.pos[0]/2, -strategy.pos[1]/2, -strategy.pos[2]/2]}
-                      rotation={[
-                        strategy.pos[2] !== 0 ? Math.PI / 2 : 0,
-                        0,
-                        strategy.pos[0] !== 0 ? Math.PI / 2 : 0
-                      ]}
-                    >
-                      <meshStandardMaterial color="#cccccc" />
-                    </Cylinder>
-                    
-                    {/* Strategy icon */}
-                    {strategy.icon === "cloud" && <CloudServer position={[0, 0.5, 0]} scale={0.5} color="#4ecdc4" />}
-                    {strategy.icon === "hybrid" && (
-                      <Torus args={[0.4, 0.1, 8, 32]} position={[0, 0.5, 0]}>
-                        <meshStandardMaterial color="#f39c12" />
-                      </Torus>
-                    )}
-                    {strategy.icon === "renewable" && <RenewableEnergy position={[0, 0, 0]} scale={0.4} />}
-                    {strategy.icon === "efficiency" && <EfficiencyMeter position={[0, 0.5, 0]} scale={0.5} value={1.1} />}
-                    
-                    {/* Label */}
-                    <Text position={[0, -0.8, 0]} fontSize={0.12} color="#000000" textAlign="center">
-                      {strategy.label}
+              
+              {/* Factores múltiples */}
+              <group position={[0, -1, 0]}>
+                {['Location', 'Energy Mix', 'Scale', 'Practices'].map((factor, i) => (
+                  <group key={i} position={[(i - 1.5) * 1.2, 0, 0]}>
+                    <Sphere args={[0.3]}>
+                      <meshStandardMaterial color={mainColor} opacity={0.7} transparent />
+                    </Sphere>
+                    <Text position={[0, -0.5, 0]} fontSize={0.08} color="#666666">
+                      {factor}
                     </Text>
                   </group>
                 ))}
               </group>
-            )} 
-                <group position={[0, 0, 0]}>
-                  <Cylinder args={[0.1, 0.1, 2]} position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-                    <meshStandardMaterial color={mainColor} />
-                  </Cylinder>
-                  <Cone args={[0.2, 0.5]} position={[1.2, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
-                    <meshStandardMaterial color={mainColor} />
-                  </Cone>
-                </group>
-                
-                {/* Nube con porcentaje de reducción */}
-                <group position={[2, 0, 0]}>
-                  <CloudServer position={[0, 0, 0]} scale={1} color={mainColor} />
-                  <Text position={[0, -1.5, 0]} fontSize={0.25} color="#00ff00">
-                    -60%
-                  </Text>
-                  <Text position={[0, -2, 0]} fontSize={0.15} color="#666666">
-                    emisiones
-                  </Text>
-                </group>
-              </group>
-            )
-          
-            {/* Slide 6: Empresas Medianas */}
-            {name === "Empresas Medianas" && (
+              
+              {/* Limitaciones */}
+              <Box args={[4, 0.8, 0.1]} position={[0, -2.5, 0]}>
+                <meshStandardMaterial color="#666666" opacity={0.5} transparent />
+              </Box>
+              <Text position={[0, -2.5, 0.1]} fontSize={0.1} color="#ffffff" maxWidth={3.8}>
+                Limitations: Self-reported data, 65% market focus
+              </Text>
+            </group>
+          )}
+
+          {/* Slide 15: Conclusions - NEW */}
+          {name === "Conclusions" && (
+            <group>
+              {/* Conclusiones principales */}
+              <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
+                Final Takeaways
+              </Text>
+              
+              {/* 5 conclusiones clave */}
               <group>
-                {/* Modelo híbrido */}
-                <group position={[-1.5, 0, 0]}>
-                  <Box args={[1.5, 1.5, 1.2]} position={[0, 0, 0]}>
-                    <meshStandardMaterial color="#f39c12" />
-                  </Box>
-                  <ServerRack position={[0, 0, 0]} scale={0.3} />
-                </group>
-                
-                {/* Conexión híbrida */}
-                <Torus args={[1, 0.1, 8, 32]} position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
-                  <meshStandardMaterial color={mainColor} />
-                </Torus>
-                
-                {/* Cloud parcial */}
-                <group position={[1.5, 0, 0]}>
-                  <CloudServer position={[0, 0, 0]} scale={0.8} color={mainColor} />
-                </group>
-                
-                {/* Indicador de reducción */}
-                <Text position={[0, -2, 0]} fontSize={0.25} color="#f39c12">
-                  -40-50%
-                </Text>
-                <Text position={[0, -2.5, 0]} fontSize={0.15} color="#666666">
-                  Modelo Híbrido
-                </Text>
-              </group>
-            )}
-            
-            {/* Slide 7: Grandes Corporaciones */}
-            {name === "Grandes Corporaciones" && (
-              <group>
-                {/* Torre corporativa */}
-                <group position={[0, 0, 0]}>
-                  {[0, 1, 2].map((i) => (
-                    <Box key={i} args={[2 - i * 0.3, 1, 1.5 - i * 0.2]} position={[0, i, 0]}>
-                      <meshStandardMaterial color={`hsl(${200 + i * 20}, 70%, 50%)`} />
-                    </Box>
-                  ))}
-                </group>
-                
-                {/* Paneles solares */}
-                <group position={[-2, 0, 0]}>
-                  {[...Array(4)].map((_, i) => (
-                    <Box key={i} args={[0.5, 0.5, 0.05]} position={[i * 0.6 - 0.9, 2.5, 0]} rotation={[Math.PI / 6, 0, 0]}>
-                      <meshStandardMaterial color="#1a237e" metalness={0.8} roughness={0.2} />
-                    </Box>
-                  ))}
-                </group>
-                
-                {/* Turbinas eólicas */}
-                <RenewableEnergy position={[2, 0, 0]} scale={0.8} />
-                <RenewableEnergy position={[2.5, 0, -1]} scale={0.6} />
-                
-                {/* Indicador de eficiencia */}
-                <Text position={[0, -2, 0]} fontSize={0.2} color="#00ff00">
-                  Con renovables = Cloud
-                </Text>
-              </group>
-            )}
-            
-            {/* Slide 8: Recomendaciones */}
-            {name === "Recomendaciones" && (
-              <group>
-                {/* Núcleo central */}
-                <Sphere args={[0.8, 32, 32]} position={[0, 0, 0]}>
-                  <MeshDistortMaterial color={mainColor} speed={2} distort={0.3} />
-                </Sphere>
-                
-                {/* 4 Estrategias alrededor */}
                 {[
-                  { pos: [2, 0, 0], icon: "cloud", label: "Migración\nSelectiva" },
-                  { pos: [-2, 0, 0], icon: "hybrid", label: "Modelo\nHíbrido" },
-                  { pos: [0, 0, 2], icon: "renewable", label: "Energía\nRenovable" },
-                  { pos: [0, 0, -2], icon: "efficiency", label: "Optimización\nPUE" }
-                ].map((strategy, i) => (
-                  <group key={i} position={strategy.pos}>
-                    {/* Conexión al centro */}
-                    <Cylinder 
-                      args={[0.05, 0.05, 2]} 
-                      position={[-strategy.pos[0]/2, -strategy.pos[1]/2, -strategy.pos[2]/2]}
-                      rotation={[
-                        strategy.pos[2] !== 0 ? Math.PI / 2 : 0,
-                        0,
-                        strategy.pos[0] !== 0 ? Math.PI / 2 : 0
-                      ]}
-                    >
-                      <meshStandardMaterial color="#cccccc" />
-                    </Cylinder>
+                  { text: "Transition is imperative", icon: "sphere" },
+                  { text: "Cloud advantages for small orgs", icon: "cloud" },
+                  { text: "Optimal path varies", icon: "path" },
+                  { text: "Hybrid models preferred", icon: "hybrid" },
+                  { text: "Today's decisions matter", icon: "time" }
+                ].map((conclusion, i) => (
+                  <group key={i} position={[0, 1.5 - i * 0.8, 0]}>
+                    {/* Icono */}
+                    <group position={[-2.5, 0, 0]}>
+                      {conclusion.icon === "sphere" && <Sphere args={[0.2]} />}
+                      {conclusion.icon === "cloud" && <Cloud segments={10} bounds={[0.5, 0.2, 0.2]} volume={1} />}
+                      {conclusion.icon === "path" && <Torus args={[0.2, 0.05, 8, 16]} />}
+                      {conclusion.icon === "hybrid" && (
+                        <>
+                          <Box args={[0.2, 0.2, 0.2]} position={[-0.1, 0, 0]} />
+                          <Sphere args={[0.1]} position={[0.1, 0, 0]} />
+                        </>
+                      )}
+                      {conclusion.icon === "time" && <Cylinder args={[0.2, 0.2, 0.05]} rotation={[Math.PI / 2, 0, 0]} />}
+                      <meshStandardMaterial color={mainColor} />
+                    </group>
                     
-                    {/* Icono de estrategia */}
-                    {strategy.icon === "cloud" && <CloudServer position={[0, 0.5, 0]} scale={0.5} color="#4ecdc4" />}
-                    {strategy.icon === "hybrid" && (
-                      <Torus args={[0.4, 0.1, 8, 32]} position={[0, 0.5, 0]}>
-                        <meshStandardMaterial color="#f39c12" />
-                      </Torus>
-                    )}
-                    {strategy.icon === "renewable" && <RenewableEnergy position={[0, 0, 0]} scale={0.4} />}
-                    {strategy.icon === "efficiency" && <EfficiencyMeter position={[0, 0.5, 0]} scale={0.5} value={1.1} />}
-                    
-                    {/* Etiqueta */}
-                    <Text position={[0, -0.8, 0]} fontSize={0.12} color="#000000" textAlign="center">
-                      {strategy.label}
+                    {/* Texto */}
+                    <Text position={[0, 0, 0]} fontSize={0.15} color="#000000">
+                      {i + 1}. {conclusion.text}
                     </Text>
                   </group>
                 ))}
               </group>
-            )}
-            
-            {/* Slide 9: Exploración Interactiva - NUEVO */}
-            {name === "Exploración Interactiva" && (
-              <group>
-                <Text position={[0, 3.5, 0]} fontSize={0.25} color="#000000" textAlign="center">
-                  Usa las flechas ↑↓←→ o WASD para explorar
-                </Text>
-                
-                {/* Data Center Tradicional - Izquierda */}
-                <group position={[-3, 0, 0]}>
-                  <Text position={[0, 2.5, 0]} fontSize={0.2} color="#ff0000">
-                    Data Center Tradicional
-                  </Text>
-                  <InteractiveDataCenterExploration type="traditional" position={[0, 0, 0]} scale={0.3} />
-                </group>
-                
-                {/* VS en el centro */}
-                <Text position={[0, 0, 0]} fontSize={0.4} color="#666666">
-                  VS
-                </Text>
-                
-                {/* Cloud Infrastructure - Derecha */}
-                <group position={[3, 0, 0]}>
-                  <Text position={[0, 2.5, 0]} fontSize={0.2} color="#00ff00">
-                    Cloud Computing
-                  </Text>
-                  <InteractiveDataCenterExploration type="cloud" position={[0, 0, 0]} scale={0.3} />
-                </group>
+              
+              {/* Call to action */}
+              <Box args={[4, 0.6, 0.1]} position={[0, -2.5, 0]}>
+                <meshStandardMaterial color="#10B981" />
+              </Box>
+              <Text position={[0, -2.5, 0.1]} fontSize={0.12} color="#ffffff">
+                Future: Longitudinal studies needed
+              </Text>
+            </group>
+          )}
+
+          {/* Slide 17: References - NEW */}
+          {name === "References" && (
+            <group>
+              {/* Título */}
+              <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
+                Key References
+              </Text>
+              
+              {/* Libros/papers apilados */}
+              <group position={[0, 0, 0]}>
+                {[
+                  { author: "Masanet et al.", year: "2020", color: "#3B82F6" },
+                  { author: "AWS", year: "2022-2023", color: "#FF9500" },
+                  { author: "Google", year: "2022-2023", color: "#4285F4" },
+                  { author: "Microsoft", year: "2023-2025", color: "#0078D4" },
+                  { author: "NREL", year: "2025", color: "#10B981" }
+                ].map((ref, i) => (
+                  <group key={i} position={[0, -1.5 + i * 0.3, i * 0.1]}>
+                    <Box args={[3, 0.2, 1.5]}>
+                      <meshStandardMaterial color={ref.color} />
+                    </Box>
+                    <Text position={[0, 0, 0.76]} fontSize={0.08} color="#ffffff">
+                      {ref.author} ({ref.year})
+                    </Text>
+                  </group>
+                ))}
               </group>
-            )}
+              
+              {/* Indicador de cantidad */}
+              <group position={[0, -2.5, 0]}>
+                <Text fontSize={0.15} color="#666666">
+                  15+ Scientific Sources
+                </Text>
+              </group>
+              
+              {/* Íconos de tipo de fuente */}
+              <group position={[0, 2, 0]}>
+                {['📊', '📈', '🌍'].map((emoji, i) => (
+                  <Text key={i} position={[(i - 1) * 1, 0, 0]} fontSize={0.3}>
+                    {emoji}
+                  </Text>
+                ))}
+              </group>
+            </group>
             
+          )}
+          </group>
         </Float>
         
         {/* Iluminación mejorada */}

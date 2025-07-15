@@ -33,6 +33,56 @@ export const scenes = [
     }
   },
   {
+    path: "models/toc_scene.glb",
+    mainColor: "#2563EB",
+    name: "Table of Contents",
+    description: "Scientific Method Structure",
+    stats: {
+      energy: "8",
+      label: "Sections"
+    }
+  },
+  {
+    path: "models/keywords_scene.glb",
+    mainColor: "#10B981",
+    name: "Keywords",
+    description: "Key concepts of the research",
+    stats: {
+      energy: "5",
+      label: "Terms"
+    }
+  },
+  {
+    path: "models/introduction_scene.glb",
+    mainColor: "#8B5CF6",
+    name: "Introduction",
+    description: "Problem statement and motivation",
+    stats: {
+      energy: "1%",
+      label: "Global energy use"
+    }
+  },
+  {
+    path: "models/methods_scene.glb",
+    mainColor: "#F59E0B",
+    name: "Methods",
+    description: "Research design and data sources",
+    stats: {
+      energy: "3",
+      label: "Cloud providers"
+    }
+  },
+  {
+    path: "models/results_scene.glb",
+    mainColor: "#EF4444",
+    name: "Results",
+    description: "Key findings and metrics",
+    stats: {
+      energy: "40%",
+      label: "Efficiency gain"
+    }
+  },
+  {
     path: "models/interactive_scene.glb",
     mainColor: "#FF1744",
     name: "Interactive Exploration",
@@ -113,6 +163,26 @@ export const scenes = [
     }
   },
   {
+    path: "models/discussion_scene.glb",
+    mainColor: "#DC143C",
+    name: "Discussion",
+    description: "Analysis and implications of findings",
+    stats: {
+      energy: "3",
+      label: "Key insights"
+    }
+  },
+  {
+    path: "models/conclusions_scene.glb",
+    mainColor: "#1E40AF",
+    name: "Conclusions",
+    description: "Final recommendations and future work",
+    stats: {
+      energy: "5",
+      label: "Key takeaways"
+    }
+  },
+  {
     path: "models/recommendations_scene.glb",
     mainColor: "#84CC16",
     name: "Recommendations",
@@ -120,6 +190,16 @@ export const scenes = [
     stats: {
       energy: "4",
       label: "Key strategies"
+    }
+  },
+  {
+    path: "models/references_scene.glb",
+    mainColor: "#6B7280",
+    name: "References",
+    description: "Scientific sources and citations",
+    stats: {
+      energy: "15+",
+      label: "Sources"
     }
   },
 ];

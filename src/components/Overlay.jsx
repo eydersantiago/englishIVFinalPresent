@@ -31,20 +31,14 @@ export const Overlay = () => {
         {/* Header with title or university info */}
         <div className="w-full text-center mt-8">
           {displaySlide === 0 ? (
-            <>
+            <div className="w-full text-center mt-8">
               <h2 className="text-3xl font-bold text-red-600 mb-2">
                 Universidad del Valle
               </h2>
               <p className="text-gray-600">Presented to: Diego Fernando Tenorio Restrepo</p>
-            </>
-          ) : (
-            <>
-              <h3 className="text-2xl font-bold text-gray-800">
-                Environmental Impact of Data Centers
-              </h3>
-              <p className="text-gray-600 mt-2">Universidad del Valle | 2025</p>
-            </>
-          )}
+            </div>
+          ) : null}
+
         </div>
 
         <div className="absolute top-0 bottom-0 left-0 right-0 flex-1 flex items-center justify-between p-4">
