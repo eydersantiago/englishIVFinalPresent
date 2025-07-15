@@ -28,12 +28,23 @@ export const Overlay = () => {
           visible ? "" : "opacity-0"
         } transition-opacity duration-1000`}
       >
-        {/* Replace Tesla logo with custom header */}
+        {/* Header with title or university info */}
         <div className="w-full text-center mt-8">
-          <h3 className="text-2xl font-bold text-gray-800">
-            Impacto Ambiental de Centros de Datos
-          </h3>
-          <p className="text-gray-600 mt-2">Universidad del Valle | 2025</p>
+          {displaySlide === 0 ? (
+            <>
+              <h2 className="text-3xl font-bold text-red-600 mb-2">
+                Universidad del Valle
+              </h2>
+              <p className="text-gray-600">Presented to: Diego Fernando Tenorio Restrepo</p>
+            </>
+          ) : (
+            <>
+              <h3 className="text-2xl font-bold text-gray-800">
+                Environmental Impact of Data Centers
+              </h3>
+              <p className="text-gray-600 mt-2">Universidad del Valle | 2025</p>
+            </>
+          )}
         </div>
 
         <div className="absolute top-0 bottom-0 left-0 right-0 flex-1 flex items-center justify-between p-4">
@@ -106,7 +117,7 @@ export const Overlay = () => {
             </div>
             
             {/* Additional info based on slide */}
-            {displaySlide === 2 && (
+            {displaySlide === 4 && (
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-2">
                   <svg
@@ -125,11 +136,11 @@ export const Overlay = () => {
                   </svg>
                   <p className="font-semibold text-3xl">1.8</p>
                 </div>
-                <p className="text-sm opacity-80">PUE On-premises</p>
+                <p className="text-sm opacity-80">On-premises PUE</p>
               </div>
             )}
 
-            {displaySlide === 3 && (
+            {displaySlide === 5 && (
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-2">
                   <svg
@@ -148,7 +159,7 @@ export const Overlay = () => {
                   </svg>
                   <p className="font-semibold text-3xl">3</p>
                 </div>
-                <p className="text-sm opacity-80">Principales proveedores</p>
+                <p className="text-sm opacity-80">Major providers</p>
               </div>
             )}
           </div>
@@ -164,7 +175,7 @@ export const Overlay = () => {
                     ? 'w-8 bg-gray-800' 
                     : 'bg-gray-400 hover:bg-gray-600'
                 }`}
-                aria-label={`Ir a diapositiva ${index + 1}`}
+                aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>

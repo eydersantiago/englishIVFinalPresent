@@ -23,93 +23,103 @@ import * as THREE from "three";
 
 export const scenes = [
   {
-    path: "models/datacenter_scene.glb",
-    mainColor: "#3B82F6",
-    name: "Impacto Ambiental",
-    description: "Centros de datos tradicionales vs Cloud Computing",
+    path: "models/title_scene.glb",
+    mainColor: "#DC143C",
+    name: "Environmental Impact of Data Centers",
+    description: "Eyder Santiago Suarez Chavez | Code: 2322714",
     stats: {
-      energy: "1%",
-      label: "Consumo eléctrico mundial"
-    }
-  },
-  {
-    path: "models/energy_scene.glb",
-    mainColor: "#EF4444",
-    name: "Consumo Energético",
-    description: "Entre 2010-2018: Instancias +550%, Energía +6%",
-    stats: {
-      energy: "550%",
-      label: "Crecimiento de instancias"
-    }
-  },
-  {
-    path: "models/efficiency_scene.glb",
-    mainColor: "#10B981",
-    name: "Eficiencia PUE",
-    description: "Cloud: 1.09-1.18 vs On-premises: 1.8",
-    stats: {
-      energy: "1.09",
-      label: "PUE Cloud (Google)"
-    }
-  },
-  {
-    path: "models/emissions_scene.glb",
-    mainColor: "#F59E0B",
-    name: "Emisiones CO₂e",
-    description: "AWS: 4.52 | Microsoft: 4.92 | Google: 5.25 kg CO₂e/TB año",
-    stats: {
-      energy: "4.52",
-      label: "kg CO₂e/TB año (AWS)"
-    }
-  },
-  {
-    path: "models/small_business_scene.glb",
-    mainColor: "#8B5CF6",
-    name: "Pequeñas Empresas",
-    description: "Reducción de emisiones > 60% al migrar a la nube",
-    stats: {
-      energy: "60%",
-      label: "Reducción emisiones"
-    }
-  },
-  {
-    path: "models/medium_business_scene.glb",
-    mainColor: "#EC4899",
-    name: "Empresas Medianas",
-    description: "Modelo híbrido óptimo: reducción 40-50% emisiones",
-    stats: {
-      energy: "45%",
-      label: "Reducción promedio"
-    }
-  },
-  {
-    path: "models/large_corp_scene.glb",
-    mainColor: "#14B8A6",
-    name: "Grandes Corporaciones",
-    description: "Con energía renovable igualan eficiencia de la nube",
-    stats: {
-      energy: "100%",
-      label: "Potencial renovable"
-    }
-  },
-  {
-    path: "models/recommendations_scene.glb",
-    mainColor: "#84CC16",
-    name: "Recomendaciones",
-    description: "Estrategias para la sostenibilidad digital",
-    stats: {
-      energy: "4",
-      label: "Estrategias clave"
+      energy: "2025",
+      label: "Universidad del Valle"
     }
   },
   {
     path: "models/interactive_scene.glb",
     mainColor: "#FF1744",
-    name: "Exploración Interactiva",
-    description: "Explora las diferencias entre infraestructuras",
+    name: "Interactive Exploration",
+    description: "Explore the differences between infrastructures",
     stats: {
       energy: "→",
-      label: "Usa las flechas"
+      label: "Use arrow keys"
+    }
+  },
+  {
+    path: "models/datacenter_scene.glb",
+    mainColor: "#3B82F6",
+    name: "Environmental Impact",
+    description: "Traditional data centers vs Cloud Computing",
+    stats: {
+      energy: "1%",
+      label: "Global electricity consumption"
+    }
+  },
+  {
+    path: "models/energy_scene.glb",
+    mainColor: "#EF4444",
+    name: "Energy Consumption",
+    description: "Between 2010-2018: Instances +550%, Energy +6%",
+    stats: {
+      energy: "550%",
+      label: "Instance growth"
+    }
+  },
+  {
+    path: "models/efficiency_scene.glb",
+    mainColor: "#10B981",
+    name: "PUE Efficiency",
+    description: "Cloud: 1.09-1.18 vs On-premises: 1.8",
+    stats: {
+      energy: "1.09",
+      label: "Cloud PUE (Google)"
+    }
+  },
+  {
+    path: "models/emissions_scene.glb",
+    mainColor: "#F59E0B",
+    name: "CO₂e Emissions",
+    description: "AWS: 4.52 | Microsoft: 4.92 | Google: 5.25 kg CO₂e/TB year",
+    stats: {
+      energy: "4.52",
+      label: "kg CO₂e/TB year (AWS)"
+    }
+  },
+  {
+    path: "models/small_business_scene.glb",
+    mainColor: "#8B5CF6",
+    name: "Small Businesses",
+    description: "Emission reduction > 60% when migrating to cloud",
+    stats: {
+      energy: "60%",
+      label: "Emission reduction"
+    }
+  },
+  {
+    path: "models/medium_business_scene.glb",
+    mainColor: "#EC4899",
+    name: "Medium Businesses",
+    description: "Optimal hybrid model: 40-50% emission reduction",
+    stats: {
+      energy: "45%",
+      label: "Average reduction"
+    }
+  },
+  {
+    path: "models/large_corp_scene.glb",
+    mainColor: "#14B8A6",
+    name: "Large Corporations",
+    description: "With renewable energy they match cloud efficiency",
+    stats: {
+      energy: "100%",
+      label: "Renewable potential"
+    }
+  },
+  {
+    path: "models/recommendations_scene.glb",
+    mainColor: "#84CC16",
+    name: "Recommendations",
+    description: "Strategies for digital sustainability",
+    stats: {
+      energy: "4",
+      label: "Key strategies"
     }
   },
 ];
@@ -432,38 +442,38 @@ export const Experience = () => {
           position-x={viewport.width + slideDistance}
           position-y={viewport.height / 2 + 1.5}
         >
-          <boxGeometry />
+          <icosahedronGeometry args={[1, 0]} />
           <MeshDistortMaterial color={scenes[1].mainColor} speed={3} />
         </mesh>
 
-        <Dodecahedron
+        <mesh
           position-x={2 * (viewport.width + slideDistance)}
           position-y={viewport.height / 2 + 1.5}
         >
+          <sphereGeometry args={[1, 32, 32]} />
           <MeshDistortMaterial color={scenes[2].mainColor} speed={3} />
-        </Dodecahedron>
+        </mesh>
 
         <mesh
           position-x={3 * (viewport.width + slideDistance)}
           position-y={viewport.height / 2 + 1.5}
         >
-          <torusGeometry args={[1, 0.3, 16, 100]} />
+          <boxGeometry />
           <MeshDistortMaterial color={scenes[3].mainColor} speed={3} />
         </mesh>
 
-        <mesh
+        <Dodecahedron
           position-x={4 * (viewport.width + slideDistance)}
           position-y={viewport.height / 2 + 1.5}
         >
-          <sphereGeometry args={[1, 32, 32]} />
           <MeshDistortMaterial color={scenes[4].mainColor} speed={3} />
-        </mesh>
+        </Dodecahedron>
 
         <mesh
           position-x={5 * (viewport.width + slideDistance)}
           position-y={viewport.height / 2 + 1.5}
         >
-          <boxGeometry />
+          <torusGeometry args={[1, 0.3, 16, 100]} />
           <MeshDistortMaterial color={scenes[5].mainColor} speed={3} />
         </mesh>
 
@@ -471,24 +481,32 @@ export const Experience = () => {
           position-x={6 * (viewport.width + slideDistance)}
           position-y={viewport.height / 2 + 1.5}
         >
-          <torusGeometry args={[1, 0.3, 16, 100]} />
+          <sphereGeometry args={[1, 32, 32]} />
           <MeshDistortMaterial color={scenes[6].mainColor} speed={3} />
         </mesh>
 
-        <Dodecahedron
+        <mesh
           position-x={7 * (viewport.width + slideDistance)}
           position-y={viewport.height / 2 + 1.5}
         >
+          <boxGeometry />
           <MeshDistortMaterial color={scenes[7].mainColor} speed={3} />
-        </Dodecahedron>
+        </mesh>
 
         <mesh
           position-x={8 * (viewport.width + slideDistance)}
           position-y={viewport.height / 2 + 1.5}
         >
-          <icosahedronGeometry args={[1, 0]} />
+          <torusGeometry args={[1, 0.3, 16, 100]} />
           <MeshDistortMaterial color={scenes[8].mainColor} speed={3} />
         </mesh>
+
+        <Dodecahedron
+          position-x={9 * (viewport.width + slideDistance)}
+          position-y={viewport.height / 2 + 1.5}
+        >
+          <MeshDistortMaterial color={scenes[9].mainColor} speed={3} />
+        </Dodecahedron>
       </group>
 
       {/* Grid con colores más industriales */}
