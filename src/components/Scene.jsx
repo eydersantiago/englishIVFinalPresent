@@ -23,7 +23,57 @@ import {
 import * as THREE from "three";
 import React, { useEffect, useRef, useState } from "react";
 import { DEG2RAD } from "three/src/math/MathUtils";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
+
+export const InfoGroup = ({ threshold = 5, children }) => {
+  const { camera } = useThree();
+  const ref            = useRef();          // ← posición real del grupo
+  const [opacity, setOpacity] = useState(1);
+
+  useFrame(() => {
+    if (!ref.current) return;
+
+    // distancia cámara‑grupo, NO distancia al (0,0,0)
+    const target = new THREE.Vector3();
+    ref.current.getWorldPosition(target);
+    const dist = camera.position.distanceTo(target);
+
+    const fadeRange = threshold * 0.4;               // 40 % de zona de mezcla
+    const newOp =
+      dist < threshold
+        ? Math.max(0, (dist - (threshold - fadeRange)) / fadeRange)
+        : 1;
+
+    if (newOp !== opacity) setOpacity(newOp);
+  });
+
+  // clona los hijos inyectando la opacidad
+  const mapped = React.Children.map(children, (child) => {
+    // Text de drei
+    if (child?.type === Text)
+      return React.cloneElement(child, { fillOpacity: opacity });
+
+    // materiales de Mesh
+    if (child?.props?.children)
+      return React.cloneElement(child, {
+        children: React.Children.map(child.props.children, (gc) =>
+          gc?.type?.name?.includes("Material")
+            ? React.cloneElement(gc, { opacity, transparent: true })
+            : gc
+        ),
+      });
+
+    // grupos anidados
+    if (child?.type === "group")
+      return (
+        <InfoGroup threshold={threshold}>{child.props.children}</InfoGroup>
+      );
+
+    return child;
+  });
+
+  return <group ref={ref}>{mapped}</group>;
+};
 
 // Componente para crear un servidor rack
 const ServerRack = ({ position, scale = 1, color }) => {
@@ -382,7 +432,7 @@ const InteractiveDataCenterExploration = ({ type, position, scale = 1 }) => {
   }
 };
 
-export const Scene = ({ mainColor, path, name, stats, ...props }) => {
+export const Scene = ({ mainColor, path, name, description, stats, ...props }) => {
   const ratioScale = Math.min(1.2, Math.max(0.5, window.innerWidth / 1920));
   
   return (
@@ -502,7 +552,7 @@ export const Scene = ({ mainColor, path, name, stats, ...props }) => {
             <group>
               {/* Nube de palabras clave en 3D */}
               <Float speed={1} rotationIntensity={0.5} floatIntensity={0.5}>
-                <group>
+                <InfoGroup threshold={6}>
                   <Text position={[0, 1.5, 0]} fontSize={0.3} color={mainColor}>
                     Data Centers
                   </Text>
@@ -518,24 +568,27 @@ export const Scene = ({ mainColor, path, name, stats, ...props }) => {
                   <Text position={[1, -0.5, -0.3]} fontSize={0.2} color="#8B5CF6">
                     Sustainability
                   </Text>
-                </group>
+                </InfoGroup>
               </Float>
               
               {/* Conexiones entre términos */}
-              {[...Array(8)].map((_, i) => (
-                <Cylinder
-                  key={i}
-                  args={[0.01, 0.01, 2]}
-                  position={[0, 0, 0]}
-                  rotation={[
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI
-                  ]}
-                >
-                  <meshBasicMaterial color="#cccccc" opacity={0.3} transparent />
-                </Cylinder>
-              ))}
+              <InfoGroup threshold={4}>
+                {[...Array(8)].map((_, i) => (
+                  <Cylinder
+                    key={i}
+                    args={[0.01, 0.01, 2]}
+                    position={[0, 0, 0]}
+                    rotation={[
+                      Math.random() * Math.PI,
+                      Math.random() * Math.PI,
+                      Math.random() * Math.PI
+                    ]}
+                  >
+                    <meshBasicMaterial color="#cccccc" opacity={0.3} transparent />
+                  </Cylinder>
+                ))}
+              </InfoGroup>
+              
             </group>
           )}
 
@@ -630,285 +683,288 @@ export const Scene = ({ mainColor, path, name, stats, ...props }) => {
                   <Text position={[0, -0.8, 0]} fontSize={0.1} color="#666666">
                     2022-2025
                   </Text>
-                </group>
-              </group>
-              
-              {/* Métricas analizadas */}
-              <group position={[0, -1.5, 0]}>
-                <Text position={[0, 0, 0]} fontSize={0.15} color="#000000">
-                  Metrics: PUE • Energy • CO₂e/TB
-                </Text>
-              </group>
-              
-              {/* Herramientas */}
-              <group position={[0, -2.5, 0]}>
-                {['ESG Reports', 'Climatiq', 'NREL'].map((tool, i) => (
-                  <Cylinder
-                    key={i}
-                    args={[0.3, 0.3, 0.1]}
-                    position={[(i - 1) * 1.2, 0, 0]}
-                  >
-                    <meshStandardMaterial color={mainColor} metalness={0.5} />
-                  </Cylinder>
-                ))}
-              </group>
-            </group>
-          )}
-
-          {/* Slide 5: Results Overview - NEW */}
-          {name === "Results" && (
-            <group>
-              {/* Título de resultados */}
-              <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
-                Key Findings
-              </Text>
-              
-              {/* Resultado 1: PUE Comparison */}
-              <group position={[-2.5, 0.5, 0]}>
-                <Box args={[1.5, 1, 0.1]}>
-                  <meshStandardMaterial color="#10B981" />
-                </Box>
-                <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
-                  PUE{'\n'}35-40%{'\n'}Better
-                </Text>
-              </group>
-              
-              {/* Resultado 2: Emissions */}
-              <group position={[0, 0.5, 0]}>
-                <Box args={[1.5, 1, 0.1]}>
-                  <meshStandardMaterial color="#F59E0B" />
-                </Box>
-                <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
-                  CO₂e{'\n'}4.52-5.25{'\n'}kg/TB/yr
-                </Text>
-              </group>
-              
-              {/* Resultado 3: Size Impact */}
-              <group position={[2.5, 0.5, 0]}>
-                <Box args={[1.5, 1, 0.1]}>
-                  <meshStandardMaterial color="#8B5CF6" />
-                </Box>
-                <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
-                  Small Biz{'\n'}-60%{'\n'}Emissions
-                </Text>
-              </group>
-              
-              {/* Gráfico abstracto de tendencia */}
-              <group position={[0, -1.5, 0]}>
-                {[...Array(5)].map((_, i) => (
-                  <Box
-                    key={i}
-                    args={[0.3, 0.2 + i * 0.3, 0.3]}
-                    position={[(i - 2) * 0.5, (0.2 + i * 0.3) / 2 - 0.5, 0]}
-                  >
-                    <meshStandardMaterial color={mainColor} />
-                  </Box>
-                ))}
-                <Text position={[0, -1, 0]} fontSize={0.1} color="#666666">
-                  Growth 2010-2018
-                </Text>
-              </group>
-            </group>
-          )}
-
-          {/* Slide 14: Discussion - NEW */}
-          {name === "Discussion" && (
-            <group>
-              {/* Insights principales */}
-              <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
-                Key Insights
-              </Text>
-              
-              {/* Paradoja PUE vs Emisiones */}
-              <group position={[0, 1, 0]}>
-                <Torus args={[0.8, 0.3, 16, 100]} rotation={[Math.PI / 2, 0, 0]}>
-                  <meshStandardMaterial color="#ff6b6b" />
-                </Torus>
-                <Text position={[0, 0, 0]} fontSize={0.1} color="#000000" textAlign="center">
-                  Paradox:{'\n'}Best PUE ≠{'\n'}Lowest CO₂
-                </Text>
-              </group>
-              
-              {/* Factores múltiples */}
-              <group position={[0, -1, 0]}>
-                {['Location', 'Energy Mix', 'Scale', 'Practices'].map((factor, i) => (
-                  <group key={i} position={[(i - 1.5) * 1.2, 0, 0]}>
-                    <Sphere args={[0.3]}>
-                      <meshStandardMaterial color={mainColor} opacity={0.7} transparent />
-                    </Sphere>
-                    <Text position={[0, -0.5, 0]} fontSize={0.08} color="#666666">
-                      {factor}
-                    </Text>
                   </group>
-                ))}
-              </group>
-              
-              {/* Limitaciones */}
-              <Box args={[4, 0.8, 0.1]} position={[0, -2.5, 0]}>
-                <meshStandardMaterial color="#666666" opacity={0.5} transparent />
-              </Box>
-              <Text position={[0, -2.5, 0.1]} fontSize={0.1} color="#ffffff" maxWidth={3.8}>
-                Limitations: Self-reported data, 65% market focus
-              </Text>
-            </group>
-          )}
+             </group>
+             
+             {/* Métricas analizadas */}
+             <group position={[0, -1.5, 0]}>
+               <Text position={[0, 0, 0]} fontSize={0.15} color="#000000">
+                 Metrics: PUE • Energy • CO₂e/TB
+               </Text>
+             </group>
+             
+             {/* Herramientas */}
+             <group position={[0, -2.5, 0]}>
+               {['ESG Reports', 'Climatiq', 'NREL'].map((tool, i) => (
+                 <Cylinder
+                   key={i}
+                   args={[0.3, 0.3, 0.1]}
+                   position={[(i - 1) * 1.2, 0, 0]}
+                 >
+                   <meshStandardMaterial color={mainColor} metalness={0.5} />
+                 </Cylinder>
+               ))}
+             </group>
+           </group>
+         )}
 
-          {/* Slide 15: Conclusions - NEW */}
-          {name === "Conclusions" && (
-            <group>
-              {/* Conclusiones principales */}
-              <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
-                Final Takeaways
-              </Text>
-              
-              {/* 5 conclusiones clave */}
-              <group>
-                {[
-                  { text: "Transition is imperative", icon: "sphere" },
-                  { text: "Cloud advantages for small orgs", icon: "cloud" },
-                  { text: "Optimal path varies", icon: "path" },
-                  { text: "Hybrid models preferred", icon: "hybrid" },
-                  { text: "Today's decisions matter", icon: "time" }
-                ].map((conclusion, i) => (
-                  <group key={i} position={[0, 1.5 - i * 0.8, 0]}>
-                    {/* Icono */}
-                    <group position={[-2.5, 0, 0]}>
-                      {conclusion.icon === "sphere" && <Sphere args={[0.2]} />}
-                      {conclusion.icon === "cloud" && <Cloud segments={10} bounds={[0.5, 0.2, 0.2]} volume={1} />}
-                      {conclusion.icon === "path" && <Torus args={[0.2, 0.05, 8, 16]} />}
-                      {conclusion.icon === "hybrid" && (
-                        <>
-                          <Box args={[0.2, 0.2, 0.2]} position={[-0.1, 0, 0]} />
-                          <Sphere args={[0.1]} position={[0.1, 0, 0]} />
-                        </>
-                      )}
-                      {conclusion.icon === "time" && <Cylinder args={[0.2, 0.2, 0.05]} rotation={[Math.PI / 2, 0, 0]} />}
-                      <meshStandardMaterial color={mainColor} />
-                    </group>
-                    
-                    {/* Texto */}
-                    <Text position={[0, 0, 0]} fontSize={0.15} color="#000000">
-                      {i + 1}. {conclusion.text}
-                    </Text>
-                  </group>
-                ))}
-              </group>
-              
-              {/* Call to action */}
-              <Box args={[4, 0.6, 0.1]} position={[0, -2.5, 0]}>
-                <meshStandardMaterial color="#10B981" />
-              </Box>
-              <Text position={[0, -2.5, 0.1]} fontSize={0.12} color="#ffffff">
-                Future: Longitudinal studies needed
-              </Text>
-            </group>
-          )}
+         {/* Slide 5: Results Overview - NEW */}
+         {name === "Results" && (
+           <group>
+             <InfoGroup threshold={5}>
+               {/* Título de resultados */}
+               <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
+                 Key Findings
+               </Text>
+               
+               {/* Resultado 1: PUE Comparison */}
+               <group position={[-2.5, 0.5, 0]}>
+                 <Box args={[1.5, 1, 0.1]}>
+                   <meshStandardMaterial color="#10B981" />
+                 </Box>
+                 <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
+                   PUE{'\n'}35-40%{'\n'}Better
+                 </Text>
+               </group>
+               
+               {/* Resultado 2: Emissions */}
+               <group position={[0, 0.5, 0]}>
+                 <Box args={[1.5, 1, 0.1]}>
+                   <meshStandardMaterial color="#F59E0B" />
+                 </Box>
+                 <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
+                   CO₂e{'\n'}4.52-5.25{'\n'}kg/TB/yr
+                 </Text>
+               </group>
+               
+               {/* Resultado 3: Size Impact */}
+               <group position={[2.5, 0.5, 0]}>
+                 <Box args={[1.5, 1, 0.1]}>
+                   <meshStandardMaterial color="#8B5CF6" />
+                 </Box>
+                 <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
+                   Small Biz{'\n'}-60%{'\n'}Emissions
+                 </Text>
+               </group>
+             </InfoGroup>
+             
+             {/* Gráfico abstracto de tendencia - permanece visible */}
+             <group position={[0, -1.5, 0]}>
+               {[...Array(5)].map((_, i) => (
+                 <Box
+                   key={i}
+                   args={[0.3, 0.2 + i * 0.3, 0.3]}
+                   position={[(i - 2) * 0.5, (0.2 + i * 0.3) / 2 - 0.5, 0]}
+                 >
+                   <meshStandardMaterial color={mainColor} />
+                 </Box>
+               ))}
+               <Text position={[0, -1, 0]} fontSize={0.1} color="#666666">
+                 Growth 2010-2018
+               </Text>
+             </group>
+           </group>
+         )}
 
-          {/* Slide 17: References - NEW */}
-          {name === "References" && (
-            <group>
-              {/* Título */}
-              <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
-                Key References
-              </Text>
-              
-              {/* Libros/papers apilados */}
-              <group position={[0, 0, 0]}>
-                {[
-                  { author: "Masanet et al.", year: "2020", color: "#3B82F6" },
-                  { author: "AWS", year: "2022-2023", color: "#FF9500" },
-                  { author: "Google", year: "2022-2023", color: "#4285F4" },
-                  { author: "Microsoft", year: "2023-2025", color: "#0078D4" },
-                  { author: "NREL", year: "2025", color: "#10B981" }
-                ].map((ref, i) => (
-                  <group key={i} position={[0, -1.5 + i * 0.3, i * 0.1]}>
-                    <Box args={[3, 0.2, 1.5]}>
-                      <meshStandardMaterial color={ref.color} />
-                    </Box>
-                    <Text position={[0, 0, 0.76]} fontSize={0.08} color="#ffffff">
-                      {ref.author} ({ref.year})
-                    </Text>
-                  </group>
-                ))}
-              </group>
-              
-              {/* Indicador de cantidad */}
-              <group position={[0, -2.5, 0]}>
-                <Text fontSize={0.15} color="#666666">
-                  15+ Scientific Sources
-                </Text>
-              </group>
-              
-              {/* Íconos de tipo de fuente */}
-              <group position={[0, 2, 0]}>
-                {['📊', '📈', '🌍'].map((emoji, i) => (
-                  <Text key={i} position={[(i - 1) * 1, 0, 0]} fontSize={0.3}>
-                    {emoji}
-                  </Text>
-                ))}
-              </group>
-            </group>
-            
-          )}
-          </group>
-        </Float>
-        
-        {/* Iluminación mejorada */}
-        <ambientLight intensity={0.3} color="#ffeaa7" />
-        <directionalLight position={[5, 5, 5]} intensity={0.5} castShadow />
-        <pointLight position={[-5, 5, -5]} intensity={0.3} color="#74b9ff" />
-        
-        <AccumulativeShadows
-          frames={100}
-          alphaTest={0.9}
-          scale={30}
-          position={[0, -0.005, 0]}
-          color="pink"
-          opacity={0.8}
-        >
-          <RandomizedLight
-            amount={4}
-            radius={9}
-            intensity={0.8}
-            ambient={0.25}
-            position={[10, 5, 15]}
-          />
-          <RandomizedLight
-            amount={4}
-            radius={5}
-            intensity={0.5}
-            position={[-5, 5, 15]}
-            bias={0.001}
-          />
-        </AccumulativeShadows>
-        
-        <Environment preset="city" blur={0.8}>
-          <Lightformer
-            position={[5, 0, -5]}
-            form="rect"
-            intensity={1}
-            color="red"
-            scale={[3, 5]}
-            target={[0, 0, 0]}
-          />
-          <Lightformer
-            position={[-5, 0, 1]}
-            form="circle"
-            intensity={1}
-            color="green"
-            scale={[2, 5]}
-            target={[0, 0, 0]}
-          />
-          <Lightformer
-            position={[0, 5, -2]}
-            form="ring"
-            intensity={0.5}
-            color="orange"
-            scale={[10, 5]}
-            target={[0, 0, 0]}
-          />
-        </Environment>
-      </group>
-    </>
-  );
+         {/* Slide 14: Discussion - NEW */}
+         {name === "Discussion" && (
+           <group>
+             {/* Insights principales */}
+             <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
+               Key Insights
+             </Text>
+             
+             {/* Paradoja PUE vs Emisiones */}
+             <group position={[0, 1, 0]}>
+               <Torus args={[0.8, 0.3, 16, 100]} rotation={[Math.PI / 2, 0, 0]}>
+                 <meshStandardMaterial color="#ff6b6b" />
+               </Torus>
+               <Text position={[0, 0, 0]} fontSize={0.1} color="#000000" textAlign="center">
+                 Paradox:{'\n'}Best PUE ≠{'\n'}Lowest CO₂
+               </Text>
+             </group>
+             
+             {/* Factores múltiples */}
+             <group position={[0, -1, 0]}>
+               {['Location', 'Energy Mix', 'Scale', 'Practices'].map((factor, i) => (
+                 <group key={i} position={[(i - 1.5) * 1.2, 0, 0]}>
+                   <Sphere args={[0.3]}>
+                     <meshStandardMaterial color={mainColor} opacity={0.7} transparent />
+                   </Sphere>
+                   <Text position={[0, -0.5, 0]} fontSize={0.08} color="#666666">
+                     {factor}
+                   </Text>
+                 </group>
+               ))}
+             </group>
+             
+             {/* Limitaciones */}
+             <Box args={[4, 0.8, 0.1]} position={[0, -2.5, 0]}>
+               <meshStandardMaterial color="#666666" opacity={0.5} transparent />
+             </Box>
+             <Text position={[0, -2.5, 0.1]} fontSize={0.1} color="#ffffff" maxWidth={3.8}>
+               Limitations: Self-reported data, 65% market focus
+             </Text>
+           </group>
+         )}
+
+         {/* Slide 15: Conclusions - NEW */}
+         {name === "Conclusions" && (
+           <group>
+             {/* Conclusiones principales */}
+             <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
+               Final Takeaways
+             </Text>
+             
+             {/* 5 conclusiones clave */}
+             <group>
+               {[
+                 { text: "Transition is imperative", icon: "sphere" },
+                 { text: "Cloud advantages for small orgs", icon: "cloud" },
+                 { text: "Optimal path varies", icon: "path" },
+                 { text: "Hybrid models preferred", icon: "hybrid" },
+                 { text: "Today's decisions matter", icon: "time" }
+               ].map((conclusion, i) => (
+                 <group key={i} position={[0, 1.5 - i * 0.8, 0]}>
+                   {/* Icono */}
+                   <group position={[-2.5, 0, 0]}>
+                     {conclusion.icon === "sphere" && <Sphere args={[0.2]} />}
+                     {conclusion.icon === "cloud" && <Cloud segments={10} bounds={[0.5, 0.2, 0.2]} volume={1} />}
+                     {conclusion.icon === "path" && <Torus args={[0.2, 0.05, 8, 16]} />}
+                     {conclusion.icon === "hybrid" && (
+                       <>
+                         <Box args={[0.2, 0.2, 0.2]} position={[-0.1, 0, 0]} />
+                         <Sphere args={[0.1]} position={[0.1, 0, 0]} />
+                       </>
+                     )}
+                     {conclusion.icon === "time" && <Cylinder args={[0.2, 0.2, 0.05]} rotation={[Math.PI / 2, 0, 0]} />}
+                     <meshStandardMaterial color={mainColor} />
+                   </group>
+                   
+                   {/* Texto */}
+                   <Text position={[0, 0, 0]} fontSize={0.15} color="#000000">
+                     {i + 1}. {conclusion.text}
+                   </Text>
+                 </group>
+               ))}
+             </group>
+             
+             {/* Call to action */}
+             <Box args={[4, 0.6, 0.1]} position={[0, -2.5, 0]}>
+               <meshStandardMaterial color="#10B981" />
+             </Box>
+             <Text position={[0, -2.5, 0.1]} fontSize={0.12} color="#ffffff">
+               Future: Longitudinal studies needed
+             </Text>
+           </group>
+         )}
+
+         {/* Slide 17: References - NEW */}
+         {name === "References" && (
+           <group>
+             {/* Título */}
+             <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
+               Key References
+             </Text>
+             
+             {/* Libros/papers apilados */}
+             <group position={[0, 0, 0]}>
+               {[
+                 { author: "Masanet et al.", year: "2020", color: "#3B82F6" },
+                 { author: "AWS", year: "2022-2023", color: "#FF9500" },
+                 { author: "Google", year: "2022-2023", color: "#4285F4" },
+                 { author: "Microsoft", year: "2023-2025", color: "#0078D4" },
+                 { author: "NREL", year: "2025", color: "#10B981" }
+               ].map((ref, i) => (
+                 <group key={i} position={[0, -1.5 + i * 0.3, i * 0.1]}>
+                   <Box args={[3, 0.2, 1.5]}>
+                     <meshStandardMaterial color={ref.color} />
+                   </Box>
+                   <Text position={[0, 0, 0.76]} fontSize={0.08} color="#ffffff">
+                     {ref.author} ({ref.year})
+                   </Text>
+                 </group>
+               ))}
+             </group>
+             
+             {/* Indicador de cantidad */}
+             <group position={[0, -2.5, 0]}>
+               <Text fontSize={0.15} color="#666666">
+                 15+ Scientific Sources
+               </Text>
+             </group>
+             
+             {/* Íconos de tipo de fuente */}
+             <group position={[0, 2, 0]}>
+               {['📊', '📈', '🌍'].map((emoji, i) => (
+                 <Text key={i} position={[(i - 1) * 1, 0, 0]} fontSize={0.3}>
+                   {emoji}
+                 </Text>
+               ))}
+             </group>
+           </group>
+           
+         )}
+         </group>
+       </Float>
+       
+       {/* Iluminación mejorada */}
+       <ambientLight intensity={0.3} color="#ffeaa7" />
+       <directionalLight position={[5, 5, 5]} intensity={0.5} castShadow />
+       <pointLight position={[-5, 5, -5]} intensity={0.3} color="#74b9ff" />
+       
+       <AccumulativeShadows
+         frames={100}
+         alphaTest={0.9}
+         scale={30}
+         position={[0, -0.005, 0]}
+         color="pink"
+         opacity={0.8}
+       >
+         <RandomizedLight
+           amount={4}
+           radius={9}
+           intensity={0.8}
+           ambient={0.25}
+           position={[10, 5, 15]}
+         />
+         <RandomizedLight
+           amount={4}
+           radius={5}
+           intensity={0.5}
+           position={[-5, 5, 15]}
+           bias={0.001}
+         />
+       </AccumulativeShadows>
+       
+       <Environment preset="city" blur={0.8}>
+         <Lightformer
+           position={[5, 0, -5]}
+           form="rect"
+           intensity={1}
+           color="red"
+           scale={[3, 5]}
+           target={[0, 0, 0]}
+         />
+         <Lightformer
+           position={[-5, 0, 1]}
+           form="circle"
+           intensity={1}
+           color="green"
+           scale={[2, 5]}
+           target={[0, 0, 0]}
+         />
+         <Lightformer
+           position={[0, 5, -2]}
+           form="ring"
+           intensity={0.5}
+           color="orange"
+           scale={[10, 5]}
+           target={[0, 0, 0]}
+         />
+       </Environment>
+     </group>
+     
+   </>
+ );
 };
