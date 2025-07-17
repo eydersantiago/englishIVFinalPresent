@@ -4,19 +4,11 @@ import { scenes } from "./Experience";
 
 export const slideAtom = atom(0);
 
-/**  -----------  AJUSTA AQUÍ ------------- */
-const ZOOM_FADE_THRESHOLD = 0.05; // 5% de zoom
-const ZOOM_CLEAR_MS = 800; // milisegundos antes de volver visible
-const DPR_POLL_INTERVAL = 300; // cada cuánto comprobar devicePixelRatio
-/** --------------------------------------- */
-
 export const Overlay = () => {
   const [slide, setSlide] = useAtom(slideAtom);
   const [displaySlide, setDisplaySlide] = useState(slide);
   const [visible, setVisible] = useState(false);
-  const [zoomed, setZoomed] = useState(false);
-  const wheelTimeout = useRef();
-  const initialDPR = useRef(window.devicePixelRatio);
+  const [textHidden, setTextHidden] = useState(false); // Estado para controlar si el texto está oculto
 
   /* ---------- Fade‑in inicial ---------- */
   useEffect(() => {
@@ -34,126 +26,25 @@ export const Overlay = () => {
     return () => clearTimeout(id);
   }, [slide]);
 
-  /* ---------- Función central para activar el fade por zoom ---------- */
-  const triggerZoomFade = () => {
-    console.log("Zoom detectado - ocultando texto");
-    setZoomed(true);
-    clearTimeout(wheelTimeout.current);
-    wheelTimeout.current = setTimeout(() => {
-      console.log("Restaurando texto después del zoom");
-      setZoomed(false);
-    }, ZOOM_CLEAR_MS);
-  };
-
-  /* ---------- Detección de zoom con rueda del ratón ---------- */
-  useEffect(() => {
-    const onWheel = (e) => {
-      // Detectar Ctrl + rueda (Windows/Linux) o Cmd + rueda (Mac)
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault(); // Prevenir el zoom del navegador si es posible
-        triggerZoomFade();
-      }
-    };
-
-    // Usar capture para interceptar el evento antes
-    window.addEventListener("wheel", onWheel, { passive: false });
-    
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      clearTimeout(wheelTimeout.current);
-    };
-  }, []);
-
-  /* ---------- Detección de atajos de teclado para zoom ---------- */
+  /* ---------- Detección de tecla P para toggle ---------- */
   useEffect(() => {
     const onKeyDown = (e) => {
-      // Detectar Ctrl/Cmd + (+, -, 0)
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === "+" || e.key === "=" || e.key === "-" || e.key === "0") {
-          console.log("Atajo de zoom detectado:", e.key);
-          triggerZoomFade();
-        }
+      // Detectar tecla P (mayúscula o minúscula)
+      if (e.key === "p" || e.key === "P") {
+        e.preventDefault(); // Prevenir comportamiento por defecto
+        setTextHidden(prev => !prev); // Toggle del estado
+        console.log("Tecla P presionada - texto", textHidden ? "visible" : "oculto");
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-
-  /* ---------- Detección de pinch zoom en dispositivos táctiles ---------- */
-  useEffect(() => {
-    if (!window.visualViewport) return;
-
-    const checkPinchZoom = () => {
-      const scale = window.visualViewport.scale;
-      if (Math.abs(scale - 1) > ZOOM_FADE_THRESHOLD) {
-        console.log("Pinch zoom detectado, escala:", scale);
-        triggerZoomFade();
-      }
-    };
-
-    window.visualViewport.addEventListener("resize", checkPinchZoom);
-    window.visualViewport.addEventListener("scroll", checkPinchZoom);
-    
-    return () => {
-      window.visualViewport.removeEventListener("resize", checkPinchZoom);
-      window.visualViewport.removeEventListener("scroll", checkPinchZoom);
-    };
-  }, []);
-
-  /* ---------- Polling de devicePixelRatio para detectar zoom del navegador ---------- */
-  useEffect(() => {
-    let lastDPR = window.devicePixelRatio;
-    
-    const checkDPR = () => {
-      const currentDPR = window.devicePixelRatio;
-      const dprChange = Math.abs(currentDPR - lastDPR);
-      
-      // Detectar cambios significativos en el DPR
-      if (dprChange > 0.01) {
-        console.log("Cambio en devicePixelRatio detectado:", lastDPR, "->", currentDPR);
-        triggerZoomFade();
-        lastDPR = currentDPR;
-      }
-    };
-
-    const intervalId = setInterval(checkDPR, DPR_POLL_INTERVAL);
-    
-    // También escuchar el evento resize que puede indicar zoom
-    const onResize = () => {
-      checkDPR();
-    };
-    
-    window.addEventListener("resize", onResize);
-    
-    return () => {
-      clearInterval(intervalId);
-      window.removeEventListener("resize", onResize);
-    };
-  }, []);
-
-  /* ---------- Detección adicional con gesturestart/gesturechange (Safari) ---------- */
-  useEffect(() => {
-    const onGesture = (e) => {
-      if (e.scale !== 1) {
-        console.log("Gesto de zoom detectado, escala:", e.scale);
-        triggerZoomFade();
-      }
-    };
-
-    window.addEventListener("gesturestart", onGesture);
-    window.addEventListener("gesturechange", onGesture);
-    
-    return () => {
-      window.removeEventListener("gesturestart", onGesture);
-      window.removeEventListener("gesturechange", onGesture);
-    };
-  }, []);
+  }, [textHidden]);
 
   return (
     <div
       className={`fixed inset-0 z-10 flex flex-col justify-between pointer-events-none text-black transition-opacity duration-1000 ${
-        visible && !zoomed ? "" : "opacity-0"
+        visible && !textHidden ? "" : "opacity-0"
       }`}
     >
       {/* Header */}
@@ -249,6 +140,11 @@ export const Overlay = () => {
       {/* Footer */}
       <div className="absolute bottom-4 inset-x-0 text-center text-sm text-gray-600">
         Eyder Santiago Suarez Chavez | Universidad del Valle
+      </div>
+
+      {/* Indicador de tecla P (opcional - puedes quitar esto si no lo necesitas) */}
+      <div className="absolute top-4 right-4 text-xs text-gray-500 pointer-events-none">
+        Presiona 'P' para ocultar/mostrar texto
       </div>
     </div>
   );
