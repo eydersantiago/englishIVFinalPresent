@@ -260,177 +260,190 @@ const RenewableEnergy = ({ position, scale = 1 }) => {
 };
 
 // Componente para exploración interactiva de infraestructura
+// Componente para exploración interactiva de infraestructura
 const InteractiveDataCenterExploration = ({ type, position, scale = 1 }) => {
-  const [playerPos, setPlayerPos] = useState([0, 0, 0]);
-  const playerRef = useRef();
+  const { camera, gl } = useThree();
+  const controlsRef = useRef();
+  const traditionalModelRef = useRef();
+  const modernModelRef = useRef();
+  
+  // Cargar los modelos GLB
+  const traditionalModel = useGLTF('/models/data_center_low-poly.glb');
+  const modernModel = useGLTF('/models/data_center_rack.glb');
+  
+  // Estado para controlar qué vista mostrar
+  const [showTraditional, setShowTraditional] = useState(true);
+  
+  // Posición inicial de la cámara
+  const initialCameraPosition = [10, 8, 15];
+  const initialCameraTarget = [0, 0, 0];
+  
+  useEffect(() => {
+    // Configurar la posición inicial de la cámara
+    camera.position.set(...initialCameraPosition);
+    if (controlsRef.current) {
+      controlsRef.current.target.set(...initialCameraTarget);
+      controlsRef.current.update();
+    }
+  }, [camera]);
   
   useEffect(() => {
     const handleKeyPress = (e) => {
-      const speed = 0.5;
-      setPlayerPos(prev => {
-        switch(e.key) {
-          case 'ArrowUp':
-          case 'w':
-            return [prev[0], prev[1], prev[2] - speed];
-          case 'ArrowDown':
-          case 's':
-            return [prev[0], prev[1], prev[2] + speed];
-          case 'ArrowLeft':
-          case 'a':
-            return [prev[0] - speed, prev[1], prev[2]];
-          case 'ArrowRight':
-          case 'd':
-            return [prev[0] + speed, prev[1], prev[2]];
-          default:
-            return prev;
+      // Restablecer cámara con 'o' o 'O'
+      if (e.key === 'o' || e.key === 'O') {
+        camera.position.set(...initialCameraPosition);
+        if (controlsRef.current) {
+          controlsRef.current.target.set(...initialCameraTarget);
+          controlsRef.current.update();
         }
-      });
+      }
+      // Cambiar entre tradicional y moderno con 't' o 'T'
+      if (e.key === 't' || e.key === 'T') {
+        setShowTraditional(prev => !prev);
+      }
     };
     
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [camera]);
   
-  if (type === 'traditional') {
-    return (
-      <group position={position} scale={scale}>
-        {/* Piso del data center */}
-        <Box args={[10, 0.1, 10]} position={[0, -0.05, 0]}>
-          <meshStandardMaterial color="#333333" />
-        </Box>
+  return (
+    <group position={position} scale={scale}>
+      {/* Controles de órbita mejorados */}
+      <OrbitControls
+        ref={controlsRef}
+        enablePan={true}
+        enableZoom={true}
+        enableRotate={true}
+        minDistance={5}
+        maxDistance={30}
+        maxPolarAngle={Math.PI * 0.9}
+        autoRotate={false}
+      />
+      
+      {/* Piso base */}
+      <Box args={[20, 0.1, 20]} position={[0, -0.05, 0]}>
+        <meshStandardMaterial color="#1a1a1a" metalness={0.8} roughness={0.2} />
+      </Box>
+      
+      {/* Grid en el piso */}
+      <gridHelper args={[20, 20, "#444444", "#222222"]} position={[0, 0, 0]} />
+      
+      {/* Lado Tradicional (Izquierda) */}
+      <group position={[-6, 0, 0]}>
+        {/* Título */}
+        <Float speed={2} rotationIntensity={0} floatIntensity={0.5}>
+          <Text position={[0, 5, 0]} fontSize={0.5} color="#FF4444">
+            Traditional Data Center
+          </Text>
+        </Float>
         
-        {/* Filas de servidores */}
-        {[-3, -1, 1, 3].map((x, i) => (
-          <group key={i}>
-            {[-3, -1, 1, 3].map((z, j) => (
-              <ServerRack
-                key={`${i}-${j}`}
-                position={[x * 1.5, 0, z * 1.5]}
-                scale={0.6}
-                color="#4a4a4a"
-              />
-            ))}
-          </group>
-        ))}
+        {/* Modelo GLB tradicional */}
+        <group scale={[2, 2, 2]} position={[0, 0, 0]}>
+          <primitive object={traditionalModel.scene.clone()} />
+        </group>
         
-        {/* Sistema de aire acondicionado ineficiente */}
-        <Box args={[10, 0.5, 0.5]} position={[0, 3, -4.75]}>
-          <meshStandardMaterial color="#666666" />
-        </Box>
-        <Text position={[0, 3, -4.25]} fontSize={0.2} color="#ff0000">
-          Cooling: High Energy Use
-        </Text>
-        
-        {/* Cables desorganizados */}
-        {[...Array(20)].map((_, i) => (
-          <Cylinder
-            key={i}
-            args={[0.02, 0.02, 3 + Math.random() * 2]}
-            position={[
-              -4 + Math.random() * 8,
-              2.5,
-              -4 + Math.random() * 8
-            ]}
-            rotation={[Math.random() * Math.PI, Math.random() * Math.PI, 0]}
-          >
-            <meshStandardMaterial color="#ff0000" />
-          </Cylinder>
-        ))}
-        
-        {/* Indicador de jugador */}
-        <Cone 
-          ref={playerRef}
-          args={[0.2, 0.5]} 
-          position={[playerPos[0], 0.5, playerPos[2]]}
-          rotation={[0, 0, 0]}
-        >
-          <meshBasicMaterial color="#00ff00" />
-        </Cone>
-        
-        {/* Indicadores de calor/ineficiencia */}
-        <pointLight position={[0, 2, 0]} color="#ff6666" intensity={0.5} />
-      </group>
-    );
-  } else {
-    // Cloud Infrastructure
-    return (
-      <group position={position} scale={scale}>
-        {/* Piso moderno */}
-        <Box args={[10, 0.1, 10]} position={[0, -0.05, 0]}>
-          <meshStandardMaterial color="#e0e0e0" metalness={0.8} roughness={0.2} />
-        </Box>
-        
-        {/* Servidores optimizados en contenedores */}
-        {[-2, 0, 2].map((x, i) => (
-          <group key={i} position={[x * 2, 0, 0]}>
-            <RoundedBox args={[1.5, 3, 4]} radius={0.1}>
-              <meshStandardMaterial 
-                color={["#4FC3F7", "#66BB6A", "#FF7043"][i]} 
-                metalness={0.5} 
-                roughness={0.3}
-                opacity={0.9}
-                transparent
-              />
-            </RoundedBox>
-            <Text position={[0, 1.7, 2.1]} fontSize={0.15} color="#000000">
-              {["AWS", "Azure", "Google"][i]}
-            </Text>
-          </group>
-        ))}
-        
-        {/* Sistema de refrigeración eficiente */}
-        <group position={[0, 3.5, 0]}>
-          <Torus args={[3, 0.2, 8, 32]} rotation={[Math.PI / 2, 0, 0]}>
-            <meshStandardMaterial color="#4FC3F7" metalness={0.7} />
-          </Torus>
-          <Text position={[0, 0.5, 0]} fontSize={0.2} color="#00ff00">
-            Liquid Cooling System
+        {/* Indicadores de ineficiencia */}
+        <group position={[0, 3, 3]}>
+          <Box args={[3, 0.8, 0.1]}>
+            <meshStandardMaterial color="#FF4444" opacity={0.9} transparent />
+          </Box>
+          <Text position={[0, 0, 0.1]} fontSize={0.15} color="#ffffff" textAlign="center">
+            PUE: 1.8-2.5{'\n'}High Energy Use
           </Text>
         </group>
         
-        {/* Conexiones de red organizadas */}
-        {[-1, 0, 1].map((i) => (
-          <Cylinder
-            key={i}
-            args={[0.05, 0.05, 6]}
-            position={[i * 2, 3, 0]}
-            rotation={[Math.PI / 2, 0, 0]}
-          >
-            <meshStandardMaterial 
-              color="#00ff00" 
-              emissive="#00ff00" 
-              emissiveIntensity={0.5}
-            />
-          </Cylinder>
-        ))}
+        {/* Partículas de calor */}
+        <CO2Emissions position={[2, 1, 0]} scale={0.5} intensity={1} />
         
-        {/* Indicador de jugador */}
-        <Cone 
-          ref={playerRef}
-          args={[0.2, 0.5]} 
-          position={[playerPos[0], 0.5, playerPos[2]]}
-        >
-          <meshBasicMaterial color="#00ff00" />
-        </Cone>
-        
-        {/* Efectos de eficiencia */}
-        <pointLight position={[0, 3, 0]} color="#66ff66" intensity={0.3} />
-        
-        {/* Paneles de información flotantes */}
+        {/* Luz roja para indicar calor */}
+        <pointLight position={[0, 2, 0]} color="#ff6666" intensity={1} distance={5} />
+      </group>
+      
+      {/* Centro - Comparación */}
+      <group position={[0, 3, 0]}>
+        <Text fontSize={0.3} color="#4FC3F7">
+          VS
+        </Text>
+        {/* Flecha de mejora */}
+        <group position={[0, -1, 0]}>
+          <Cone args={[0.3, 1]} rotation={[0, 0, -Math.PI / 2]}>
+            <meshStandardMaterial color="#10B981" />
+          </Cone>
+          <Text position={[0, -0.5, 0]} fontSize={0.1} color="#10B981">
+            40% Less CO₂
+          </Text>
+        </group>
+      </group>
+      
+      {/* Lado Moderno (Derecha) */}
+      <group position={[6, 0, 0]}>
+        {/* Título */}
         <Float speed={2} rotationIntensity={0} floatIntensity={0.5}>
-          <Box args={[1, 0.7, 0.1]} position={[4, 2, 0]}>
-            <meshBasicMaterial color="#000000" opacity={0.8} transparent />
-          </Box>
-          <Text position={[4, 2, 0.1]} fontSize={0.1} color="#00ff00">
-            PUE: 1.15{'\n'}
-            Efficiency: 95%{'\n'}
-            Carbon: -40%
+          <Text position={[0, 5, 0]} fontSize={0.5} color="#10B981">
+            Modern Cloud Data Center
           </Text>
         </Float>
+        
+        {/* Modelo GLB moderno */}
+        <group scale={[2, 2, 2]} position={[0, 0, 0]}>
+          <primitive object={modernModel.scene.clone()} />
+        </group>
+        
+        {/* Indicadores de eficiencia */}
+        <group position={[0, 3, 3]}>
+          <Box args={[3, 0.8, 0.1]}>
+            <meshStandardMaterial color="#10B981" opacity={0.9} transparent />
+          </Box>
+          <Text position={[0, 0, 0.1]} fontSize={0.15} color="#ffffff" textAlign="center">
+            PUE: 1.1-1.2{'\n'}Optimized Cooling
+          </Text>
+        </group>
+        
+        {/* Energía renovable */}
+        <RenewableEnergy position={[-2, 0, -2]} scale={0.5} />
+        
+        {/* Luz verde para indicar eficiencia */}
+        <pointLight position={[0, 2, 0]} color="#66ff66" intensity={0.5} distance={5} />
       </group>
-    );
-  }
+      
+      {/* Panel de información flotante */}
+      <Float speed={1} rotationIntensity={0} floatIntensity={0.3}>
+        <group position={[0, 6, 0]}>
+          <Box args={[5, 1, 0.1]}>
+            <meshStandardMaterial color="#000000" opacity={0.8} transparent />
+          </Box>
+          <Text position={[0, 0.2, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
+            Interactive Comparison
+          </Text>
+          <Text position={[0, -0.2, 0.1]} fontSize={0.08} color="#4FC3F7" textAlign="center">
+            Press 'O' to reset camera | Use mouse to explore
+          </Text>
+        </group>
+      </Float>
+      
+      {/* Métricas comparativas en el suelo */}
+      <group position={[0, 0.1, 8]}>
+        {/* Traditional metrics */}
+        <group position={[-3, 0, 0]}>
+          <Text position={[0, 0, 0]} fontSize={0.15} color="#FF4444" rotation={[-Math.PI / 2, 0, 0]}>
+            Traditional:{'\n'}• High CAPEX{'\n'}• PUE: 1.8+{'\n'}• Local control
+          </Text>
+        </group>
+        
+        {/* Modern metrics */}
+        <group position={[3, 0, 0]}>
+          <Text position={[0, 0, 0]} fontSize={0.15} color="#10B981" rotation={[-Math.PI / 2, 0, 0]}>
+            Cloud:{'\n'}• Pay-per-use{'\n'}• PUE: 1.1-1.2{'\n'}• Auto-scaling
+          </Text>
+        </group>
+      </group>
+    </group>
+  );
 };
+
+
+
 
 export const Scene = ({ mainColor, path, name, description, stats, ...props }) => {
   const ratioScale = Math.min(1.2, Math.max(0.5, window.innerWidth / 1920));

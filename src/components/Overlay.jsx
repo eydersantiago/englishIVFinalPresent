@@ -144,7 +144,7 @@ export const Overlay = () => {
 
       {/* Indicador de tecla P (opcional - puedes quitar esto si no lo necesitas) */}
       <div className="absolute top-4 right-4 text-xs text-gray-500 pointer-events-none">
-        Presiona 'P' para ocultar/mostrar texto
+        Insert 'P' Hidden/show text
       </div>
     </div>
   );
