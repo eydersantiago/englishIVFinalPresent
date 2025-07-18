@@ -477,7 +477,7 @@ export const Scene = ({ mainColor, path, name, description, stats, ...props }) =
         <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
           <group scale={ratioScale}>
 
-            {name === "Environmental Impact of Data Centers" && (
+            {name === "Environmental impact of data centers and cloud computing" && (
               <group>
 
                 {/* Tu logo cargado desde URL */}
@@ -582,7 +582,7 @@ export const Scene = ({ mainColor, path, name, description, stats, ...props }) =
                     Cloud Computing
                   </Text>
                   <Text position={[1.5, 0.5, -0.5]} fontSize={0.25} color="#10B981">
-                    CO₂ Emissions
+                    CO2 Emissions
                   </Text>
                   <Text position={[-1, -0.5, 0.3]} fontSize={0.2} color="#F59E0B">
                     Environmental
@@ -1593,52 +1593,90 @@ export const Scene = ({ mainColor, path, name, description, stats, ...props }) =
           </group>
         )}
 
-         {/* Slide 17: References - NEW */}
-         {name === "References" && (
-           <group>
-             {/* Título */}
-             <Text position={[0, 2.5, 0]} fontSize={0.25} color="#000000">
-               Key References
-             </Text>
-             
-             {/* Libros/papers apilados */}
-             <group position={[0, 0, 0]}>
-               {[
-                 { author: "Masanet et al.", year: "2020", color: "#3B82F6" },
-                 { author: "AWS", year: "2022-2023", color: "#FF9500" },
-                 { author: "Google", year: "2022-2023", color: "#4285F4" },
-                 { author: "Microsoft", year: "2023-2025", color: "#0078D4" },
-                 { author: "NREL", year: "2025", color: "#10B981" }
-               ].map((ref, i) => (
-                 <group key={i} position={[0, -1.5 + i * 0.3, i * 0.1]}>
-                   <Box args={[3, 0.2, 1.5]}>
-                     <meshStandardMaterial color={ref.color} />
-                   </Box>
-                   <Text position={[0, 0, 0.76]} fontSize={0.08} color="#ffffff">
-                     {ref.author} ({ref.year})
-                   </Text>
-                 </group>
-               ))}
-             </group>
-             
-             {/* Indicador de cantidad */}
-             <group position={[0, -2.5, 0]}>
-               <Text fontSize={0.15} color="#666666">
-                 15+ Scientific Sources
-               </Text>
-             </group>
-             
-             {/* Íconos de tipo de fuente */}
-             <group position={[0, 2, 0]}>
-               {['📊', '📈', '🌍'].map((emoji, i) => (
-                 <Text key={i} position={[(i - 1) * 1, 0, 0]} fontSize={0.3}>
-                   {emoji}
-                 </Text>
-               ))}
-             </group>
-           </group>
-           
-         )}
+        {/* Slide 17: References - NEW */}
+        {name === "References" && (
+          <group>
+            {/* Título */}
+            <Text position={[0, 3.5, 0]} fontSize={0.25} color="#000000">
+              Key References
+            </Text>
+            
+            {/* Libros/papers apilados con URLs */}
+            <group position={[0, 0, 0]}>
+              {[
+                {
+                  author: "Masanet et al.",
+                  year: "2020",
+                  color: "#3B82F6",
+                  url: "https://datacenters.lbl.gov/sites/default/files/Masanet_et_al_Science_2020.full_.pdf"
+                },
+                {
+                  author: "Amazon (2022)",
+                  year: "2022",
+                  color: "#FF9500",
+                  url: "https://sustainability.aboutamazon.com/2022-sustainability-report.pdf"
+                },
+                {
+                  author: "Amazon (2023)",
+                  year: "2023",
+                  color: "#FF9500",
+                  url: "https://sustainability.aboutamazon.com/2023-amazon-sustainability-report.pdf"
+                },
+                {
+                  author: "Google Cloud (2022)",
+                  year: "2022-2023",
+                  color: "#4285F4",
+                  url: "https://cloud.google.com/blog/topics/sustainability/google-cloud-2022-sustainability-year-in-review"
+                },
+                {
+                  author: "Google (2023)",
+                  year: "2023",
+                  color: "#4285F4",
+                  url: "https://blog.google/outreach-initiatives/sustainability/environmental-impact-report-2023/"
+                },
+                {
+                  author: "Microsoft (2023)",
+                  year: "2023",
+                  color: "#0078D4",
+                  url: "https://blogs.microsoft.com/on-the-issues/2023/05/10/2022-environmental-sustainability-report/"
+                },
+                {
+                  author: "Microsoft (2024)",
+                  year: "2024",
+                  color: "#0078D4",
+                  url: "https://blogs.microsoft.com/on-the-issues/2024/05/15/microsoft-environmental-sustainability-report-2024/"
+                },
+                {
+                  author: "Microsoft (2025)",
+                  year: "2025",
+                  color: "#0078D4",
+                  url: "https://aka.ms/SustainabilityReport2025"
+                },
+                {
+                  author: "NREL",
+                  year: "2025",
+                  color: "#10B981",
+                  url: "https://www.nrel.gov/computational-science/measuring-efficiency-pue"
+                }
+              ].map((ref, i) => (
+                <group key={i} position={[0, -1.5 + i * 0.5, i * 0.1]}>
+                  <Box args={[3, 0.2, 1.5]}>
+                    <meshStandardMaterial color={ref.color} />
+                  </Box>
+                  {/* Autor y año */}
+                  <Text position={[0, 0, 0.76]} fontSize={0.08} color="#ffffff">
+                    {ref.author} ({ref.year})
+                  </Text>
+                  {/* URL debajo */}
+                  <Text position={[0, -0.12, 0.76]} fontSize={0.04} color="#00BFFF">
+                    {ref.url}
+                  </Text>
+                </group>
+              ))}
+            </group>
+          </group>
+        )}
+
          </group>
        </Float>
        
