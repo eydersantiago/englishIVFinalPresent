@@ -25,7 +25,7 @@ export const scenes = [
   {
     path: "models/title_scene.glb",
     mainColor: "#DC143C",
-    name: "Environmental Impact of Data Centers",
+    name: "Environmental impact of data centers and cloud computing",
     description: "Eyder Santiago Suarez Chavez | Code: 2322714",
     stats: {
       energy: "2025",

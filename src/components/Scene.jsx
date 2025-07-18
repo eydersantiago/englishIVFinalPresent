@@ -25,6 +25,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { DEG2RAD } from "three/src/math/MathUtils";
 import { useFrame, useThree } from "@react-three/fiber";
 
+
+// Precargar los modelos GLB
+useGLTF.preload('/models/data_center_low-poly.glb');
+useGLTF.preload('/models/data_center_rack.glb');
+
 export const InfoGroup = ({ threshold = 5, children }) => {
   const { camera } = useThree();
   const ref            = useRef();          // ← posición real del grupo
@@ -271,8 +276,8 @@ const InteractiveDataCenterExploration = ({ type, position, scale = 1 }) => {
   const traditionalModel = useGLTF('/models/data_center_low-poly.glb');
   const modernModel = useGLTF('/models/data_center_rack.glb');
   
-  // Estado para controlar qué vista mostrar
-  const [showTraditional, setShowTraditional] = useState(true);
+  // Estado para controlar qué modelo mostrar
+  const [currentModel, setCurrentModel] = useState('traditional'); // 'traditional' o 'modern'
   
   // Posición inicial de la cámara
   const initialCameraPosition = [10, 8, 15];
@@ -297,10 +302,10 @@ const InteractiveDataCenterExploration = ({ type, position, scale = 1 }) => {
           controlsRef.current.update();
         }
       }
-      // Cambiar entre tradicional y moderno con 't' o 'T'
+      // Cambiar entre modelos con 't' o 'T'
       if (e.key === 't' || e.key === 'T') {
-        setShowTraditional(prev => !prev);
-      }
+        setCurrentModel(prev => prev === 'traditional' ? 'modern' : 'traditional');
+}
     };
     
     window.addEventListener('keydown', handleKeyPress);
@@ -329,7 +334,7 @@ const InteractiveDataCenterExploration = ({ type, position, scale = 1 }) => {
       {/* Grid en el piso */}
       <gridHelper args={[20, 20, "#444444", "#222222"]} position={[0, 0, 0]} />
       
-      {/* Lado Tradicional (Izquierda) */}
+{/* Lado Tradicional (Izquierda) */}
       <group position={[-6, 0, 0]}>
         {/* Título */}
         <Float speed={2} rotationIntensity={0} floatIntensity={0.5}>
@@ -338,9 +343,13 @@ const InteractiveDataCenterExploration = ({ type, position, scale = 1 }) => {
           </Text>
         </Float>
         
-        {/* Modelo GLB tradicional */}
+        {/* Modelo GLB - muestra uno u otro según el estado */}
         <group scale={[2, 2, 2]} position={[0, 0, 0]}>
-          <primitive object={traditionalModel.scene.clone()} />
+          {currentModel === 'traditional' ? (
+            <primitive object={traditionalModel.scene.clone()} />
+          ) : (
+            <primitive object={modernModel.scene.clone()} />
+          )}
         </group>
         
         {/* Indicadores de ineficiencia */}
@@ -417,7 +426,7 @@ const InteractiveDataCenterExploration = ({ type, position, scale = 1 }) => {
             Interactive Comparison
           </Text>
           <Text position={[0, -0.2, 0.1]} fontSize={0.08} color="#4FC3F7" textAlign="center">
-            Press 'O' to reset camera | Use mouse to explore
+            Press 'O' to reset camera | 'T' to switch models | Use mouse to explore
           </Text>
         </group>
       </Float>
@@ -736,7 +745,7 @@ export const Scene = ({ mainColor, path, name, description, stats, ...props }) =
                    <meshStandardMaterial color="#10B981" />
                  </Box>
                  <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
-                   PUE{'\n'}35-40%{'\n'}Better
+                   PUE    {'\n'}    35-40%   {'\n'}Better
                  </Text>
                </group>
                
@@ -746,7 +755,7 @@ export const Scene = ({ mainColor, path, name, description, stats, ...props }) =
                    <meshStandardMaterial color="#F59E0B" />
                  </Box>
                  <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
-                   CO₂e{'\n'}4.52-5.25{'\n'}kg/TB/yr
+                   CO2e    {'\n'}    4.52-5.25  {'\n'}  kg/TB/yr
                  </Text>
                </group>
                
@@ -756,7 +765,7 @@ export const Scene = ({ mainColor, path, name, description, stats, ...props }) =
                    <meshStandardMaterial color="#8B5CF6" />
                  </Box>
                  <Text position={[0, 0, 0.1]} fontSize={0.12} color="#ffffff" textAlign="center">
-                   Small Biz{'\n'}-60%{'\n'}Emissions
+                   Small Biz    {'\n'}  -60%   {'\n'}Emissions
                  </Text>
                </group>
              </InfoGroup>
@@ -780,6 +789,19 @@ export const Scene = ({ mainColor, path, name, description, stats, ...props }) =
          )}
 
 
+        {/* Slide 6: Interactive Exploration - NEW */}
+        {name === "Interactive Exploration" && (
+          <group>
+            {/* Desactivar los controles por defecto para este slide */}
+            <PerspectiveCamera makeDefault position={[10, 8, 15]} near={0.5} far={100} />
+            
+            <InteractiveDataCenterExploration 
+              type="comparison" 
+              position={[0, 0, 0]} 
+              scale={0.1}  // Reducir la escala general
+            />
+          </group>
+        )}
          {/* Slide 7: Environmental Impact - Data Centers vs Cloud */}
         {name === "Environmental Impact" && (
           <group>
