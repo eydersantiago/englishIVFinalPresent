@@ -202,6 +202,17 @@ export const scenes = [
       label: "Sources"
     }
   },
+
+    {
+    path: "models/thanks.glb",
+    mainColor: "#6B7280",
+    name: "Thank you",
+    description: "Thanks for your attention!",
+    stats: {
+      energy: "",
+      label: "👋🏻"
+    }
+  },
 ];
 
 // Componente para crear humo/emisiones animadas
